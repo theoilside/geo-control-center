@@ -1,5 +1,6 @@
-import {Box, Flex, Stack, VStack, Button, Heading, FormLabel, Input} from "@chakra-ui/react";
+import {Box, Flex, Stack, VStack, Button, Heading} from "@chakra-ui/react";
 import PasswordField from "../../components/login-page/PasswordField.tsx";
+import EmailField from "../../components/login-page/EmailField.tsx";
 
 function LoginPage() {
     return (
@@ -12,17 +13,14 @@ function LoginPage() {
                 </Stack>
                 <Box
                     className="login-container"
-                    py={{ base: '4', sm: '8' }}
-                    px={{ base: '4', sm: '10' }}
+                    width={'40%'}
+                    padding={'30px'}
                     borderWidth="2px"
                     borderRadius="12px"
                 >
                     <Stack spacing="6">
                         <Stack spacing="5">
-                            <>
-                                <FormLabel htmlFor="email">Почта</FormLabel>
-                                <Input id="email" type="email" placeholder="Введите почту" />
-                            </>
+                            <EmailField />
                             <PasswordField />
                         </Stack>
                         <Stack spacing="6">
