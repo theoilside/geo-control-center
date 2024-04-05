@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
 import {
     DEFAULT_LAYOUT,
     AUTH_LAYOUT,
@@ -29,6 +29,10 @@ const router = createBrowserRouter([
         errorElement: <ErrorPage />,
         children: [
             {
+                path: '',
+                element: <Navigate to={COUNTRIES_PAGE} />
+            },
+            {
                 path: COUNTRIES_PAGE,
                 element: <CountriesPage />,
             },
@@ -49,6 +53,22 @@ const router = createBrowserRouter([
             },
         ],
     },
-]);
+    {
+        path: '/*',
+        element: <BaseLayout />,
+        errorElement: <ErrorPage />,
+        children: [
+            {
+                path: '*',
+                element: <ErrorPage />
+            }
+        ]
+
+    }
+],
+{
+    // TODO: Удалить при деплое вне GitHub Pages
+    basename: '/geo-control-center'
+});
 
 export default router;

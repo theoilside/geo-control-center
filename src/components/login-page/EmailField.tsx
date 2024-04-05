@@ -4,7 +4,7 @@ function EmailField() {
     return (
         <FormControl>
             <FormLabel htmlFor="email">Почта</FormLabel>
-            <Input id="email" type="email" placeholder="Введите почту" />
+            <Input size={'md'} id="email" type="email" placeholder="Введите почту" />
         </FormControl>
     );
 }

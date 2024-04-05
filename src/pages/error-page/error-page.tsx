@@ -6,10 +6,17 @@ function ErrorPage() {
     const navigate = useNavigate();
 
     return(
-        <VStack>
-            <Heading>Ошибка</Heading>
-            <Text>Такой страницы не существует :(</Text>
-            <Button onClick={() => navigate(COUNTRIES_PAGE)}>Вернуться на главную</Button>
+        <VStack align={'left'} spacing={'30px'} maxW={'40%'}>
+            <VStack align={'left'}>
+                <Heading color={'gray.700'}>Ошибка 404</Heading>
+                <Text color={'gray.700'}>Такой страницы не существует :(</Text>
+            </VStack>
+            <Button
+                colorScheme={'orange'}
+                onClick={() => navigate(COUNTRIES_PAGE)}
+            >
+                Вернуться на главную
+            </Button>
         </VStack>
     )
 }

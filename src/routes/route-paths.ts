@@ -1,4 +1,4 @@
-export const DEFAULT_LAYOUT = '/geo-control-center';
+export const DEFAULT_LAYOUT = '';
 
 export const AUTH_LAYOUT = '/auth';
 export const LOGIN_PAGE = `${AUTH_LAYOUT}/login`;

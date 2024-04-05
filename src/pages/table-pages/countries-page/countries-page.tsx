@@ -1,5 +1,24 @@
-import {Table, TableContainer, Tbody, Td, Th, Thead, Tr, VStack, Flex} from "@chakra-ui/react";
+import {
+    Table,
+    TableContainer,
+    Tbody,
+    Td,
+    Th,
+    Thead,
+    Tr,
+    VStack,
+    Flex,
+    IconButton,
+    Link,
+} from "@chakra-ui/react";
 import TabsMenu from "../../../components/tabs-menu/TabsMenu.tsx";
+import {countries} from "../../../mocks/countries.ts";
+import { ArrowForwardIcon } from '@chakra-ui/icons';
+import { Link as ReactRouterLink } from 'react-router-dom'
+
+// type CountriesPageProps = {
+//     countries: Country[];
+// }
 
 function CountriesPage() {
     return (
@@ -11,41 +30,38 @@ function CountriesPage() {
                         <Thead>
                             <Tr>
                                 <Th isNumeric>ID</Th>
-                                <Th>Название (RU)</Th>
+                                <Th>alpha-2</Th>
+                                <Th>alpha-3</Th>
                                 <Th>Название (EN)</Th>
+                                <Th>Название (RU)</Th>
+                                <Th isNumeric>Широта</Th>
+                                <Th isNumeric>Долгота</Th>
+                                <Th>Телефонный код</Th>
+                                <Th>OSM ID</Th>
                             </Tr>
                         </Thead>
                         <Tbody>
-                            <Tr>
-                                <Td>1</Td>
-                                <Td>Россия</Td>
-                                <Td>Russia</Td>
-                            </Tr>
-                            <Tr>
-                                <Td>2</Td>
-                                <Td>Китай</Td>
-                                <Td>China</Td>
-                            </Tr>
-                            <Tr>
-                                <Td>3</Td>
-                                <Td>Канада</Td>
-                                <Td>Canada</Td>
-                            </Tr>
-                            <Tr>
-                                <Td>4</Td>
-                                <Td>Соединенные Штаты Америки</Td>
-                                <Td>United States of America</Td>
-                            </Tr>
-                            <Tr>
-                                <Td>5</Td>
-                                <Td>Франция</Td>
-                                <Td>France</Td>
-                            </Tr>
-                            <Tr>
-                                <Td>6</Td>
-                                <Td>Антарктида</Td>
-                                <Td>Antarctica</Td>
-                            </Tr>
+                            {countries.map((country) => (
+                                <Tr>
+                                    <Td color={'orange.700'}><Link as={ReactRouterLink} to='#' isExternal>{country.id}</Link></Td>
+                                    <Td>{country.code_alpha2}</Td>
+                                    <Td>{country.code_alpha3}</Td>
+                                    <Td>{country.name.en}</Td>
+                                    <Td>{country.name.ru}</Td>
+                                    <Td>{country.geometry.lat}</Td>
+                                    <Td>{country.geometry.lon}</Td>
+                                    <Td>+{country.phone_code}</Td>
+                                    <Td>{country.osm_id}</Td>
+                                    <Td>
+                                        <IconButton
+                                            aria-label={'Перейти'}
+                                            icon={<ArrowForwardIcon />}
+                                            size={'sm'}
+                                            colorScheme='orange'
+                                        />
+                                    </Td>
+                                </Tr>
+                            ))}
                         </Tbody>
                     </Table>
                 </TableContainer>

@@ -1,5 +1,5 @@
 import {Link} from 'react-router-dom';
-import {Container, Flex, Heading, HStack, Image} from "@chakra-ui/react";
+import {Divider, Flex, Heading, HStack, Image, VStack} from "@chakra-ui/react";
 import {COUNTRIES_PAGE} from "../../routes/route-paths.ts";
 import logo from '../../assets/images/logo.png';
 import LoginButton from '../components/LoginButton';
@@ -7,7 +7,7 @@ import LoginButton from '../components/LoginButton';
 function Header() {
 
     return (
-        <Container padding={'30px 0 30px 0'} as={'header'} maxW={'100%'}>
+        <VStack padding={'16px 0 16px 0'} as={'header'} maxW={'100%'} gap={'16px'}>
             <Flex w={'100%'} wrap={'nowrap'} align={'center'} justifyContent={'space-between'}>
                 <Link to={COUNTRIES_PAGE} style={{flexDirection: 'row'}}>
                     <HStack spacing={'3'} justify={'left'} flexGrow={'1'}>
@@ -17,7 +17,8 @@ function Header() {
                 </Link>
                 <LoginButton/>
             </Flex>
-        </Container>
+            <Divider />
+        </VStack>
     )
 }
 
