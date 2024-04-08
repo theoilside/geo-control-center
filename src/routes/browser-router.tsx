@@ -4,7 +4,7 @@ import {
     AUTH_LAYOUT,
     LOGIN_PAGE,
     COUNTRIES_PAGE,
-    REGIONS_PAGE,
+    REGIONS_PAGE, COUNTRY_PAGE,
     // COUNTRY_PAGE,
     // REGION_PAGE,
     // CITIES_PAGE,
@@ -21,6 +21,7 @@ import ErrorPage from '../pages/error-page/error-page'
 import CountriesPage from "../pages/table-pages/countries-page/countries-page.tsx";
 import RegionsPage from "../pages/table-pages/regions-page/regions-page.tsx";
 import LoginPage from "../pages/login-page/login-page.tsx";
+import CountryPage from "../pages/object-pages/country-page/country-page.tsx";
 
 const router = createBrowserRouter([
     {
@@ -35,6 +36,10 @@ const router = createBrowserRouter([
             {
                 path: COUNTRIES_PAGE,
                 element: <CountriesPage />,
+            },
+            {
+                path: COUNTRY_PAGE,
+                element: <CountryPage />,
             },
             {
                 path: REGIONS_PAGE,
@@ -67,7 +72,7 @@ const router = createBrowserRouter([
     }
 ],
 {
-    // TODO: Удалить при деплое вне GitHub Pages
+    // Удалить при деплое вне GitHub Pages
     basename: '/geo-control-center'
 });
 

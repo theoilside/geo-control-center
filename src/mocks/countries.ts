@@ -14,7 +14,8 @@ export const countries: Country[] = [
             lon: 97.69
         },
         phone_code: 7,
-        osm_id: '60189'
+        osm_id: '60189',
+        del: false,
     },
     {
         id: 2,
@@ -29,7 +30,8 @@ export const countries: Country[] = [
             lon: 92.45
         },
         phone_code: 380,
-        osm_id: '60995'
+        osm_id: '60995',
+        del: false,
     },
     {
         id: 3,
@@ -44,6 +46,23 @@ export const countries: Country[] = [
             lon: 88.652
         },
         phone_code: 7,
-        osm_id: '60990'
+        osm_id: '60990',
+        del: false,
+    },
+    {
+        id: 4,
+        code_alpha2: 'KZ',
+        code_alpha3: 'KAZ',
+        name: {
+            ru: 'Казахстан Ленд',
+            en: 'Kazakhstan Land',
+        },
+        geometry: {
+            lat: 52.26,
+            lon: 88.652
+        },
+        phone_code: 7,
+        osm_id: '60990',
+        del: true,
     },
 ]

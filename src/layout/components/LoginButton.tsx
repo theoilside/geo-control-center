@@ -11,6 +11,7 @@ function LoginButton() {
             rightIcon={<BiLockOpenAlt />}
             colorScheme='orange'
             variant='outline'
+            size={'sm'}
         >
         Войти
         </Button>

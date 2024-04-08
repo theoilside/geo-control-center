@@ -9,4 +9,5 @@ export type Country = {
     geometry: Geometry;
     phone_code: number;
     osm_id: string;
+    del: boolean;
 }
