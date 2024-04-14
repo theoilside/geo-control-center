@@ -84,7 +84,7 @@ function CountryPage() {
                                     Тип
                                 </Heading>
                                 <Text pt='2' fontSize='sm'>
-                                    Страна {country.del && ' (удалено)'}
+                                    Страна {country.isDel && ' (удалено)'}
                                 </Text>
                             </Box>
                             <Box>
@@ -92,7 +92,7 @@ function CountryPage() {
                                     Код (alpha-2)
                                 </Heading>
                                 <Text pt='2' fontSize='sm'>
-                                    {country.code_alpha2}
+                                    {country.codeAlpha2}
                                 </Text>
                             </Box>
                             <Box>
@@ -100,7 +100,7 @@ function CountryPage() {
                                     Код (alpha-3)
                                 </Heading>
                                 <Text pt='2' fontSize='sm'>
-                                    {country.code_alpha3}
+                                    {country.codeAlpha3}
                                 </Text>
                             </Box>
                             <Box>
@@ -124,7 +124,7 @@ function CountryPage() {
                                     Телефонный код
                                 </Heading>
                                 <Text pt='2' fontSize='sm'>
-                                    +{country.phone_code}
+                                    +{country.phoneCode}
                                 </Text>
                             </Box>
                             <Box>
@@ -132,8 +132,8 @@ function CountryPage() {
                                     OpenStreetMap ID
                                 </Heading>
                                 <Text pt='2' fontSize='sm'>
-                                    <Link href={`https://openstreetmap.org/relation/${country.osm_id}`} color={'teal'} isExternal>
-                                        {country.osm_id}<ExternalLinkIcon mx='4px' />
+                                    <Link href={`https://openstreetmap.org/relation/${country.osmId}`} color={'teal'} isExternal>
+                                        {country.osmId}<ExternalLinkIcon mx='4px' />
                                     </Link>
                                 </Text>
                             </Box>

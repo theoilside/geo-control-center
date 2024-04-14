@@ -3,11 +3,11 @@ import {Geometry} from "./Geometry.ts";
 
 export type Country = {
     id: number;
-    code_alpha2: string;
-    code_alpha3: string;
+    codeAlpha2: string;
+    codeAlpha3: string;
     name: Name;
     geometry: Geometry;
-    phone_code: number;
-    osm_id: string;
-    del: boolean;
+    phoneCode: number;
+    osmId: string;
+    isDel: boolean;
 }
