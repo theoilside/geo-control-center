@@ -29,7 +29,7 @@
 Сборка и работа с API:
 - Vite (5.2.0)
 - Node.js (20.12.0)
-- Orval (6.27.1)
+- Orval (6.27.1) + React Query
 
 Компоненты:
 - ChakraUI (2.8.2)

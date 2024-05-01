@@ -1,67 +1,41 @@
 import {
-  Box,
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
   Card,
   CardBody,
-  CardHeader,
-  Heading,
   Stack,
   StackDivider,
-  Text,
   Flex,
-  Button,
   VStack,
-  HStack,
-  Tooltip,
   ScaleFade,
   Fade,
-  Link,
+  Skeleton,
 } from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom";
 import { COUNTRIES_PAGE } from "../../../routes/route-paths.ts";
 import { countries } from "../../../mocks/countries.ts";
 import ErrorPage from "../../error-page/error-page.tsx";
-import { BiEditAlt } from "react-icons/bi";
-import { useEffect, useState } from "react";
-import { ExternalLinkIcon } from "@chakra-ui/icons";
 import { useGetCountryByIdApiCountryIdGet } from "../../../api/generated/reactQuery/country/country.ts";
 import { useCountryId } from "../../../hooks/useCountryId.ts";
-
-// type CountryPageProps = {
-//     countrypId: number;
-//     countryName: string;
-// }
+import { RowObjectInfo } from "../../../components/object-page/RowObjectInfo.tsx";
+import { RowObjectInfoLink } from "../../../components/object-page/RowObjectInfoLink.tsx";
+import Map from "../../../components/map/map.tsx";
+import {HeaderWithAction} from "../../../components/object-page/HeaderWithActions.tsx";
+import {formatDate} from "../../../components/formatDate.ts";
 
 function CountryPage() {
-  const [pageIsOpen, setPageIsOpen] = useState<boolean>(false);
   const countryIndex = useCountryId();
-  const { data: country } = useGetCountryByIdApiCountryIdGet(countryIndex);
-
-  useEffect(() => {
-    (async () => {
-      await delay(100);
-      setPageIsOpen(true);
-    })();
-  }, []);
+  const { data: country, isLoading } =
+    useGetCountryByIdApiCountryIdGet(countryIndex);
 
   if (countryIndex < 0 || countryIndex >= countries.length) {
     return <ErrorPage />;
   }
 
-  function delay(ms: number) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
-
-  // Тут загрузка
-  if (!country) {
-    return null;
-  }
-
   return (
     <VStack width={"100%"} spacing={"20px"} align={"left"}>
-      <Fade in={pageIsOpen}>
+      <Fade in={!isLoading}>
         <Breadcrumb fontWeight="medium" fontSize="md">
           <BreadcrumbItem>
             <BreadcrumbLink as={RouterLink} to={COUNTRIES_PAGE}>
@@ -69,92 +43,65 @@ function CountryPage() {
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbItem isCurrentPage>
-            <BreadcrumbLink href="#">Страна #{country.id}</BreadcrumbLink>
+            <BreadcrumbLink href="#">Страна #{country?.id}</BreadcrumbLink>
           </BreadcrumbItem>
         </Breadcrumb>
       </Fade>
-      <ScaleFade initialScale={0.95} in={pageIsOpen}>
+      <ScaleFade initialScale={0.95} in={!isLoading}>
         <Flex gap={"10px"}>
           <Card variant={"outline"} flexGrow={1}>
-            <Flex w={"100%"} wrap={"nowrap"} gap={"20px"}>
-              <CardHeader flexGrow={1}>
-                <Heading size="md">{country.name}</Heading>
-              </CardHeader>
-              <HStack padding={"15px 20px"}>
-                <Tooltip
-                  hasArrow
-                  label="Войдите, чтобы редактировать"
-                  bg="gray.700"
-                >
-                  <Button
-                    variant={"outline"}
-                    colorScheme="orange"
-                    leftIcon={<BiEditAlt />}
-                    isDisabled
-                  >
-                    Редактировать
-                  </Button>
-                </Tooltip>
-              </HStack>
-            </Flex>
+            <HeaderWithAction title={country?.name} />
             <CardBody>
               <Stack divider={<StackDivider />} spacing="4">
-                <Box>
-                  <Heading size="xs" textTransform="uppercase">
-                    Тип
-                  </Heading>
-                  <Text pt="2" fontSize="sm">
-                    Страна
-                  </Text>
-                </Box>
-                <Box>
-                  <Heading size="xs" textTransform="uppercase">
-                    Код (alpha-2)
-                  </Heading>
-                  <Text pt="2" fontSize="sm">
-                    {country.iso3116_alpha2}
-                  </Text>
-                </Box>
-                <Box>
-                  <Heading size="xs" textTransform="uppercase">
-                    Код (alpha-3)
-                  </Heading>
-                  <Text pt="2" fontSize="sm">
-                    {country.iso3166_alpha3}
-                  </Text>
-                </Box>
-                <Box>
-                  <Heading size="xs" textTransform="uppercase">
-                    Телефонный код
-                  </Heading>
-                  <Text pt="2" fontSize="sm">
-                    +{country.phone_code}
-                  </Text>
-                </Box>
-                <Box>
-                  <Heading size="xs" textTransform="uppercase">
-                    OpenStreetMap ID
-                  </Heading>
-                  <Text pt="2" fontSize="sm">
-                    <Link
-                      href={`https://openstreetmap.org/relation/${country.osm_id}`}
-                      color={"teal"}
-                      isExternal
-                    >
-                      {country.osm_id}
-                      <ExternalLinkIcon mx="4px" />
-                    </Link>
-                  </Text>
-                </Box>
+                <RowObjectInfo title={"Тип"} content={"Страна"} />
+                <RowObjectInfo
+                  title={"Код (alpha-2)"}
+                  content={country?.iso3116_alpha2}
+                  tooltip={'ISO 3116'}
+                />
+                <RowObjectInfo
+                  title={"Код (alpha-3)"}
+                  content={country?.iso3166_alpha3}
+                  tooltip={'ISO 3166'}
+                />
+                <RowObjectInfo
+                  title={"Телефонный код"}
+                  content={country?.phone_code}
+                />
+                <RowObjectInfo
+                    title={"Телефонная маска"}
+                    content={country?.phone_mask}
+                    tooltip={'. — любая цифра'}
+                />
+                <RowObjectInfoLink
+                  title={"OSM (Nominatim)"}
+                  link={`https://nominatim.openstreetmap.org/lookup?osm_ids=${country?.osm_type}${country?.osm_id}`}
+                  content={`${country?.osm_type}${country?.osm_id}`}
+                />
+                <RowObjectInfo
+                    title={"Последнее изменение"}
+                    content={formatDate(country?.last_updated_at)}
+                />
+                <RowObjectInfo
+                    title={"Удалено"}
+                    content={country?.deleted_at as string}
+                />
               </Stack>
             </CardBody>
           </Card>
-          {/*<Map*/}
-          {/*    pointGeometry={{lat: country.geometry.lat, lon: country.geometry.lon}}*/}
-          {/*    pointName={country.name.ru}*/}
-          {/*    pointType={'Страна'}*/}
-          {/*    zoom={3}*/}
-          {/*/>*/}
+          <Skeleton isLoaded={!isLoading || country !== undefined}>
+            {country && (
+              <Map
+                pointGeometry={{
+                  lat: country.latitude,
+                  lon: country.longitude,
+                }}
+                pointName={country.name}
+                pointType={"страна"}
+                zoom={3}
+              />
+            )}
+          </Skeleton>
         </Flex>
       </ScaleFade>
     </VStack>
