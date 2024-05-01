@@ -1,6 +1,6 @@
-export const DEFAULT_LAYOUT = '';
+export const DEFAULT_LAYOUT = "";
 
-export const AUTH_LAYOUT = '/auth';
+export const AUTH_LAYOUT = "/auth";
 export const LOGIN_PAGE = `${AUTH_LAYOUT}/login`;
 
 export const COUNTRIES_PAGE = `${DEFAULT_LAYOUT}/countries`;
