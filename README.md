@@ -21,6 +21,8 @@ https://theoilside.github.io/geo-control-center/
 
 ## Локальный запуск
 
+После поднятия [бэкенда](https://github.com/Mihey-Melnikov/api_geo/):
+
 1. Клонируйте репозиторий.
 2. Установка зависимостей: `npm install`
 3. Запуск приложения: `npm start`
