@@ -23,11 +23,13 @@ import { RowObjectInfoLink } from "../../../components/object-page/RowObjectInfo
 import Map from "../../../components/map/map.tsx";
 import {HeaderWithAction} from "../../../components/object-page/HeaderWithActions.tsx";
 import {formatDate} from "../../../components/formatDate.ts";
+import {timeSince} from "../../../components/timeSince.ts";
 
 function CountryPage() {
   const countryIndex = useCountryId();
-  const { data: country, isLoading } =
+  const { data: country, isLoading, refetch } =
     useGetCountryByIdApiCountryIdGet(countryIndex);
+
 
   if (countryIndex < 0 || countryIndex >= countries.length) {
     return <ErrorPage />;
@@ -50,10 +52,17 @@ function CountryPage() {
       <ScaleFade initialScale={0.95} in={!isLoading}>
         <Flex gap={"10px"}>
           <Card variant={"outline"} flexGrow={1}>
-            <HeaderWithAction title={country?.name} />
+            <HeaderWithAction
+                title={country?.name}
+                objectType={'Страна'}
+                isAutoUpdatable={country?.need_automatic_update}
+                deletedAt={formatDate(country?.deleted_at as string)}
+                deletedAgo={timeSince(country?.deleted_at as string)}
+                lastEditedAt={formatDate(country?.last_updated_at)}
+                lastEditedAgo={timeSince(country?.last_updated_at)}
+                refetchFunction={refetch} />
             <CardBody>
               <Stack divider={<StackDivider />} spacing="4">
-                <RowObjectInfo title={"Тип"} content={"Страна"} />
                 <RowObjectInfo
                   title={"Код (alpha-2)"}
                   content={country?.iso3116_alpha2}
@@ -75,16 +84,8 @@ function CountryPage() {
                 />
                 <RowObjectInfoLink
                   title={"OSM (Nominatim)"}
-                  link={`https://nominatim.openstreetmap.org/lookup?osm_ids=${country?.osm_type}${country?.osm_id}`}
+                  link={`https://nominatim.openstreetmap.org/ui/details.html?osmtype=${country?.osm_type}&osmid=${country?.osm_id}`}
                   content={`${country?.osm_type}${country?.osm_id}`}
-                />
-                <RowObjectInfo
-                    title={"Последнее изменение"}
-                    content={formatDate(country?.last_updated_at)}
-                />
-                <RowObjectInfo
-                    title={"Удалено"}
-                    content={country?.deleted_at as string}
                 />
               </Stack>
             </CardBody>

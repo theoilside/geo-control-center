@@ -20,7 +20,7 @@ export function RowObjectInfo({...props}: RowObjectInfoProps) {
               padding={"5px"}
               placement='top'
               label={props.tooltip}
-              bg="orange.100"
+              bg="gray.100"
               color="gray.700"
             >
               <InfoOutlineIcon />

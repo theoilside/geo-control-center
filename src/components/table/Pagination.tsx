@@ -14,7 +14,7 @@ export function Pagination({...props}: PaginationProps) {
                 ←
             </Button>
             <Text>
-                Страница {props.currentPage} из {props.totalPages && '1'}
+                Страница {props.currentPage} из {props.totalPages ?? '1'}
             </Text>
             <Button onClick={props.handleNextPageClick} size={"sm"}>
                 →

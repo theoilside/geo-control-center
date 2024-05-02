@@ -164,7 +164,7 @@ function CountriesPage() {
                     <Td>{country.phone_code}</Td>
                     <Td>
                       <Link
-                        href={`https://nominatim.openstreetmap.org/lookup?osm_ids=${country.osm_type}${country.osm_id}`}
+                        href={`https://nominatim.openstreetmap.org/ui/details.html?osmtype=${country?.osm_type}&osmid=${country?.osm_id}`}
                         color={"teal"}
                         isExternal
                       >
@@ -179,7 +179,7 @@ function CountriesPage() {
             </Table>
           </TableContainer>
           </Skeleton>
-          {(countriesPage && countriesPage.pagination.total_pages > 1) ??
+          {(countriesPage && countriesPage.pagination.total_pages > 1) &&
               <Pagination
                   currentPage={currentPage}
                   totalPages={countriesPage?.pagination.total_pages}

@@ -1,7 +1,7 @@
 // Конвертировать ISO-дату в DD.MM.YYYY HH:MM:SS
-export const formatDate = (dateString: string | undefined): string => {
+export const formatDate = (dateString: string | undefined): string | undefined => {
     if (!dateString) {
-        return '';
+        return undefined;
     }
     const date = new Date(dateString);
 
