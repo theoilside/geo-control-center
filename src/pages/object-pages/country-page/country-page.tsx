@@ -14,10 +14,9 @@ import {
 } from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom";
 import { COUNTRIES_PAGE } from "../../../routes/route-paths.ts";
-import { countries } from "../../../mocks/countries.ts";
 import ErrorPage from "../../error-page/error-page.tsx";
 import { useGetCountryByIdApiCountryIdGet } from "../../../api/generated/reactQuery/country/country.ts";
-import { useCountryId } from "../../../hooks/useCountryId.ts";
+import { useObjectId } from "../../../hooks/useObjectId.ts";
 import { RowObjectInfo } from "../../../components/object-page/RowObjectInfo.tsx";
 import { RowObjectInfoLink } from "../../../components/object-page/RowObjectInfoLink.tsx";
 import Map from "../../../components/map/map.tsx";
@@ -26,12 +25,10 @@ import {formatDate} from "../../../components/formatDate.ts";
 import {timeSince} from "../../../components/timeSince.ts";
 
 function CountryPage() {
-  const countryIndex = useCountryId();
-  const { data: country, isLoading, refetch } =
+  const countryIndex = useObjectId();
+  const { data: country, isLoading, refetch, error } =
     useGetCountryByIdApiCountryIdGet(countryIndex);
-
-
-  if (countryIndex < 0 || countryIndex >= countries.length) {
+  if (error) {
     return <ErrorPage />;
   }
 

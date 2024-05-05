@@ -3,7 +3,7 @@ import {InfoOutlineIcon} from "@chakra-ui/icons";
 
 type RowObjectInfoProps = {
     title: string;
-    content?: string;
+    content?: string | number;
     tooltip?: string;
 }
 

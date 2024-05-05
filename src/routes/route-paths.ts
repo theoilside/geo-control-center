@@ -4,10 +4,10 @@ export const AUTH_LAYOUT = "/auth";
 export const LOGIN_PAGE = `${AUTH_LAYOUT}/login`;
 
 export const COUNTRIES_PAGE = `${DEFAULT_LAYOUT}/countries`;
-export const COUNTRY_PAGE = `${COUNTRIES_PAGE}/:countryId`;
+export const COUNTRY_PAGE = `${COUNTRIES_PAGE}/:objectId`;
 
 export const REGIONS_PAGE = `${DEFAULT_LAYOUT}/regions`;
-export const REGION_PAGE = `${REGIONS_PAGE}/:regionId`;
+export const REGION_PAGE = `${REGIONS_PAGE}/:objectId`;
 
 export const CITIES_PAGE = `${DEFAULT_LAYOUT}/cities`;
 export const CITY_PAGE = `${CITIES_PAGE}/:cityId`;

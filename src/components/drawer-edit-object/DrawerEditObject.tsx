@@ -1,4 +1,4 @@
-import { CountryUpdate } from "../../api/generated/model";
+import {CountryUpdate} from "../../api/generated/model";
 import {
     Box,
     Button,
@@ -18,21 +18,21 @@ import {
     useGetCountryByIdApiCountryIdGet,
     useUpdateCountryApiCountryIdPatch
 } from "../../api/generated/reactQuery/country/country.ts";
-import {useCountryId} from "../../hooks/useCountryId.ts";
+import {useObjectId} from "../../hooks/useObjectId.ts";
 import {QueryObserverResult, RefetchOptions} from "@tanstack/react-query";
 import {HTTPValidationError} from "../../api/modals.ts";
-import {CountryRead} from "../../api/generated/model";
+import {ObjectRead} from "../../types/ObjectRead.ts";
 
 type DrawerEditObjectProps = {
     isOpened: boolean;
     handleOpenedState: (isOpened: boolean) => void;
-    refetchFunction: (options?: (RefetchOptions | undefined)) => Promise<QueryObserverResult<CountryRead, HTTPValidationError>>;
+    refetchFunction: (options?: (RefetchOptions | undefined)) => Promise<QueryObserverResult<ObjectRead, HTTPValidationError>>;
 }
 
 export function DrawerEditObject({...props}: DrawerEditObjectProps) {
     const [form, setForm] = useState<CountryUpdate>();
     const { mutateAsync } = useUpdateCountryApiCountryIdPatch();
-    const countryIndex = useCountryId();
+    const countryIndex = useObjectId();
     const { data: country } =
         useGetCountryByIdApiCountryIdGet(countryIndex);
 

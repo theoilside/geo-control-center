@@ -1,5 +1,5 @@
 // Посчитать сколько времени прошло с указанной ISO-даты
-export function timeSince(date: string | undefined): string | undefined {
+export function timeSince(date: string | undefined | null): string | undefined {
     if (!date) {
         return undefined;
     }

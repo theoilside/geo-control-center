@@ -20,14 +20,14 @@ import {
   CountryReadNeedAutomaticUpdate,
   HTTPValidationError,
 } from "../../api/modals.ts";
-import { CountryRead } from "../../api/generated/model";
 import { useState } from "react";
 import { DrawerEditObject } from "../drawer-edit-object/DrawerEditObject.tsx";
 import { RemoveObjectAlert } from "../remove-object-alert/RemoveObjectAlert.tsx";
 import { QueryObserverResult, RefetchOptions } from "@tanstack/react-query";
 import {ReviveObjectAlert} from "../revive-object-alert/ReviveObjectAlert.tsx";
-import {useCountryId} from "../../hooks/useCountryId.ts";
+import {useObjectId} from "../../hooks/useObjectId.ts";
 import {useUpdateCountryApiCountryIdPatch} from "../../api/generated/reactQuery/country/country.ts";
+import {ObjectRead} from "../../types/ObjectRead.ts";
 
 type HeaderWithActionsProps = {
   title?: string;
@@ -41,14 +41,14 @@ type HeaderWithActionsProps = {
   lastEditedAgo?: string;
   refetchFunction: (
     options?: RefetchOptions | undefined,
-  ) => Promise<QueryObserverResult<CountryRead, HTTPValidationError>>;
+  ) => Promise<QueryObserverResult<ObjectRead, HTTPValidationError>>;
 };
 
 export function HeaderWithAction({ ...props }: HeaderWithActionsProps) {
   const [isDrawerOpened, setIsDrawerOpened] = useState(false);
   const { isOpen: isDeleteAlertOpen, onOpen: onDeleteAlertOpen, onClose: onDeleteAlertClose } = useDisclosure();
   const { isOpen: isReviveAlertOpen, onOpen: onReviveAlertOpen, onClose: onReviveAlertClose } = useDisclosure();
-  const countryIndex = useCountryId();
+  const countryIndex = useObjectId();
   const { mutateAsync } = useUpdateCountryApiCountryIdPatch();
   const handleChangeAutoUpdatable = async () => {
     await mutateAsync({ id: countryIndex, data: { need_automatic_update: !props.isAutoUpdatable } })
@@ -109,7 +109,7 @@ export function HeaderWithAction({ ...props }: HeaderWithActionsProps) {
                   }
                 />)}
                 <Text fontSize="sm">
-                  {(props.deletedAt as string) ? `Удаленная ${props.objectType.toLowerCase()}` : props.objectType}
+                  {(props.deletedAt as string) ? `Удаленный ${props.objectType.toLowerCase()}` : props.objectType}
                 </Text>
               </HStack>
             </Tooltip>

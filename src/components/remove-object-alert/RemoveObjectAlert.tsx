@@ -9,10 +9,10 @@ import {
 } from "@chakra-ui/react";
 import { useRef } from "react";
 import { useDeleteCountryApiCountryIdDelete } from "../../api/generated/reactQuery/country/country.ts";
-import { useCountryId } from "../../hooks/useCountryId.ts";
-import { CountryRead } from "../../api/generated/model";
+import { useObjectId } from "../../hooks/useObjectId.ts";
 import { QueryObserverResult, RefetchOptions } from "@tanstack/react-query";
 import { HTTPValidationError } from "../../api/modals.ts";
+import {ObjectRead} from "../../types/ObjectRead.ts";
 
 type RemoveObjectAlertProps = {
   objectName?: string;
@@ -21,12 +21,12 @@ type RemoveObjectAlertProps = {
   handleOpenedState: (isOpened: boolean) => void;
   refetchFunction: (
     options?: RefetchOptions | undefined,
-  ) => Promise<QueryObserverResult<CountryRead, HTTPValidationError>>;
+  ) => Promise<QueryObserverResult<ObjectRead, HTTPValidationError>>;
 };
 
 export function RemoveObjectAlert({ ...props }: RemoveObjectAlertProps) {
   const cancelRef = useRef(null);
-  const countryIndex = useCountryId();
+  const countryIndex = useObjectId();
   const { mutateAsync } = useDeleteCountryApiCountryIdDelete();
   const handleSubmit = async () => {
     await mutateAsync({ id: countryIndex })

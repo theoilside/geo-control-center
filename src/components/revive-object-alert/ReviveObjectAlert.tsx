@@ -11,10 +11,10 @@ import { useRef } from "react";
 import {
     useUpdateCountryApiCountryIdPatch
 } from "../../api/generated/reactQuery/country/country.ts";
-import { useCountryId } from "../../hooks/useCountryId.ts";
-import { CountryRead } from "../../api/generated/model";
+import { useObjectId } from "../../hooks/useObjectId.ts";
 import { QueryObserverResult, RefetchOptions } from "@tanstack/react-query";
 import { HTTPValidationError } from "../../api/modals.ts";
+import {ObjectRead} from "../../types/ObjectRead.ts";
 
 type ReviveObjectAlertProps = {
     objectName?: string;
@@ -23,12 +23,12 @@ type ReviveObjectAlertProps = {
     handleOpenedState: (isOpened: boolean) => void;
     refetchFunction: (
         options?: RefetchOptions | undefined,
-    ) => Promise<QueryObserverResult<CountryRead, HTTPValidationError>>;
+    ) => Promise<QueryObserverResult<ObjectRead, HTTPValidationError>>;
 };
 
 export function ReviveObjectAlert({ ...props }: ReviveObjectAlertProps) {
     const cancelRef = useRef(null);
-    const countryIndex = useCountryId();
+    const countryIndex = useObjectId();
     const { mutateAsync } = useUpdateCountryApiCountryIdPatch();
     const handleSubmit = async () => {
         await mutateAsync({ id: countryIndex, data: { deleted_at: null } })
