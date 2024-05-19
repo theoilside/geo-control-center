@@ -7,6 +7,10 @@
 
 export type SearchMetroApiMetroGetParams = {
   term?: string | null;
+  country_id?: number | null;
+  region_id?: number | null;
+  city_id?: number | null;
+  include_deleted?: boolean | null;
   page_number?: number;
   page_size?: number;
 };

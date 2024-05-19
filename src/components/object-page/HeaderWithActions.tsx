@@ -25,13 +25,14 @@ import { DrawerEditObject } from "../drawer-edit-object/DrawerEditObject.tsx";
 import { RemoveObjectAlert } from "../remove-object-alert/RemoveObjectAlert.tsx";
 import { QueryObserverResult, RefetchOptions } from "@tanstack/react-query";
 import {ReviveObjectAlert} from "../revive-object-alert/ReviveObjectAlert.tsx";
-import {useObjectId} from "../../hooks/useObjectId.ts";
-import {useUpdateCountryApiCountryIdPatch} from "../../api/generated/reactQuery/country/country.ts";
 import {ObjectRead} from "../../types/ObjectRead.ts";
+import ReactCountryFlag from "react-country-flag";
 
 type HeaderWithActionsProps = {
-  title?: string;
+  objectTitle?: string;
   objectType: string;
+  objectId?: number;
+  objectCode?: string;
   isEditable?: boolean;
   isRemovable?: boolean;
   isAutoUpdatable?: CountryReadNeedAutomaticUpdate;
@@ -42,23 +43,15 @@ type HeaderWithActionsProps = {
   refetchFunction: (
     options?: RefetchOptions | undefined,
   ) => Promise<QueryObserverResult<ObjectRead, HTTPValidationError>>;
+  changeAutoUpdatableFunction: () => Promise<void>;
 };
 
 export function HeaderWithAction({ ...props }: HeaderWithActionsProps) {
   const [isDrawerOpened, setIsDrawerOpened] = useState(false);
   const { isOpen: isDeleteAlertOpen, onOpen: onDeleteAlertOpen, onClose: onDeleteAlertClose } = useDisclosure();
   const { isOpen: isReviveAlertOpen, onOpen: onReviveAlertOpen, onClose: onReviveAlertClose } = useDisclosure();
-  const countryIndex = useObjectId();
-  const { mutateAsync } = useUpdateCountryApiCountryIdPatch();
-  const handleChangeAutoUpdatable = async () => {
-    await mutateAsync({ id: countryIndex, data: { need_automatic_update: !props.isAutoUpdatable } })
-        .then(() => {
-          props.refetchFunction();
-        })
-        .catch((error) => {
-          console.error("Failed to change auto updatable property:", error);
-        });
-  };
+  const currentUser = null;
+
   const handleIsDrawerOpened = () => {
     setIsDrawerOpened(!isDrawerOpened);
   };
@@ -74,17 +67,23 @@ export function HeaderWithAction({ ...props }: HeaderWithActionsProps) {
         isOpened={isDeleteAlertOpen}
         handleOpenedState={onDeleteAlertClose}
         refetchFunction={props.refetchFunction}
-        objectName={props.title}
+        objectName={props.objectTitle}
+        objectType={props.objectType}
+        objectId={props.objectId}
       />
       <ReviveObjectAlert
           isOpened={isReviveAlertOpen}
           handleOpenedState={onReviveAlertClose}
           refetchFunction={props.refetchFunction}
-          objectName={props.title}
+          objectName={props.objectTitle}
+          objectType={props.objectType}
+          objectId={props.objectId}
       />
       <VStack flexGrow={1} alignItems={"left"} padding={"20px 20px 20px 20px"}>
         <CardHeader padding={"0"}>
-          <Heading size="md">{props.title}</Heading>
+          <Heading size="md">{props.objectTitle} {props.objectCode && <ReactCountryFlag countryCode={props.objectCode} style={{
+            fontSize: '24px',
+          }} />}</Heading>
         </CardHeader>
         <HStack>
           <Flex alignItems={"center"} gap={"5px"}>
@@ -133,32 +132,38 @@ export function HeaderWithAction({ ...props }: HeaderWithActionsProps) {
         </HStack>
       </VStack>
       <HStack padding={"10px 10px 20px 20px"}>
-        <Menu placement={"bottom-end"}>
-          <MenuButton
-            as={IconButton}
-            aria-label="Options"
-            icon={<HamburgerIcon />}
-            variant="outline"
-          />
-          <MenuList>
-            <MenuItem onClick={handleIsDrawerOpened} icon={<BiEditAlt />}>
-              Редактировать
-            </MenuItem>
-            <MenuItem onClick={handleChangeAutoUpdatable} icon={<RepeatIcon />}>
-              {(props.isAutoUpdatable as boolean) ? 'Выключить автообновление' : 'Включить автообновление'}
-            </MenuItem>
-            <MenuDivider />
-            {(props.deletedAt as string) ? (
-              <MenuItem onClick={onReviveAlertOpen} icon={<BiRedo />}>
-                Восстановить
-              </MenuItem>
-            ) : (
-              <MenuItem onClick={onDeleteAlertOpen} icon={<BiTrash />}>
-                Удалить
-              </MenuItem>
-            )}
-          </MenuList>
-        </Menu>
+        { currentUser ?
+            (
+                <Menu placement={"bottom-end"}>
+                  <MenuButton
+                      as={IconButton}
+                      aria-label="Options"
+                      icon={<HamburgerIcon />}
+                      variant="outline"
+                      disabled
+                  />
+                  <MenuList>
+                    <MenuItem onClick={handleIsDrawerOpened} icon={<BiEditAlt />}>
+                      Редактировать
+                    </MenuItem>
+                    <MenuItem onClick={() => props.changeAutoUpdatableFunction()} icon={<RepeatIcon />}>
+                      {(props.isAutoUpdatable as boolean) ? 'Выключить автообновление' : 'Включить автообновление'}
+                    </MenuItem>
+                    <MenuDivider />
+                    {(props.deletedAt as string) ? (
+                        <MenuItem onClick={onReviveAlertOpen} icon={<BiRedo />}>
+                          Восстановить
+                        </MenuItem>
+                    ) : (
+                        <MenuItem onClick={onDeleteAlertOpen} icon={<BiTrash />}>
+                          Удалить
+                        </MenuItem>
+                    )}
+                  </MenuList>
+                </Menu>
+            ) :
+            <></>
+        }
       </HStack>
     </Flex>
   );

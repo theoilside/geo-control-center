@@ -17,51 +17,37 @@ import { ArrowForwardIcon, ExternalLinkIcon } from "@chakra-ui/icons";
 import { Link as ReactRouterLink, useNavigate } from "react-router-dom";
 import TableHeader from "../../../components/table/TableHeader.tsx";
 import { getCountryPagePathById } from "../../../routes/routes.ts";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { ROWS_PER_PAGE } from "../../../settings.ts";
 import { useSearchCountriesApiCountryGet } from "../../../api/generated/reactQuery/country/country.ts";
 import { formatDate } from "../../../components/formatDate.ts";
 import { Pagination } from "../../../components/table/Pagination.tsx";
 import { NotFound } from "../../../components/table/NotFound.tsx";
 
-function CountriesPage() {
+export default function CountriesPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState<string | null>(null);
   const [isDeletedIncluded, setIsDeletedIncluded] = useState(false);
+  const currentUser = null;
 
   const { data: countriesPage, isLoading } = useSearchCountriesApiCountryGet({
     page_number: currentPage,
     page_size: ROWS_PER_PAGE,
     term: searchTerm,
+    include_deleted: isDeletedIncluded,
   });
 
-  const handleNextPageClick = useCallback(() => {
-    const current = currentPage;
-    const next = current + 1;
-    const total = countriesPage?.pagination.total_pages ?? 1;
-    setCurrentPage(next <= total ? next : current);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage]);
+  function handleNextPageClick() {
+    setCurrentPage(currentPage + 1);
+  }
 
-  const handlePrevPageClick = useCallback(() => {
-    const current = currentPage;
-    const prev = current - 1;
-    setCurrentPage(prev > 0 ? prev : current);
-  }, [currentPage]);
+  function handlePrevPageClick() {
+    setCurrentPage(currentPage - 1);
+  }
 
   const handleDeletedIncluded = () => {
     setIsDeletedIncluded(!isDeletedIncluded);
   };
-
-  function getFilteredObjects(isDeletedIncluded: boolean) {
-    return countriesPage?.data.filter((country) => {
-      if (country.deleted_at) {
-        if (isDeletedIncluded) return country;
-        return;
-      }
-      return country;
-    });
-  }
 
   const navigate = useNavigate();
 
@@ -70,17 +56,18 @@ function CountriesPage() {
       <VStack spacing={"30px"}>
         <TabsMenu selectedTabIndex={0} />
         <TableHeader
-          isEditingAvailable={true}
+          isEditingAvailable={!!currentUser}
           isSearchAvailable={true}
           isMapAvailable={false}
           onDeletedFlagChange={handleDeletedIncluded}
           getObjectPagePathById={getCountryPagePathById}
           handleSearch={(term: string | null) => setSearchTerm(term)}
+          isSearchByParentObjectIdAvailable={false}
         />
         <Flex width={"100%"} direction={"column"} gap={"15px"}>
           <Skeleton isLoaded={!isLoading}>
             <TableContainer>
-              {getFilteredObjects(isDeletedIncluded)?.length == 0 ? (
+              {countriesPage?.data.length == 0 ? (
                 <NotFound />
               ) : (
                 <Table
@@ -106,22 +93,22 @@ function CountriesPage() {
                         left={"0"}
                         backgroundColor={"#edf2f7"}
                         isNumeric
+                        style={{ textAlign: "start" }}
                       >
                         {""}
                       </Th>
-                      <Th>Название</Th>
-                      <Th>alpha-2</Th>
-                      <Th>alpha-3</Th>
-                      <Th isNumeric>Широта</Th>
-                      <Th isNumeric>Долгота</Th>
-                      <Th>Телефон</Th>
-                      <Th>OSM</Th>
-                      <Th>Изменено</Th>
+                      <Th style={{ textAlign: "start" }}>Название</Th>
+                      <Th style={{ textAlign: "start" }}>alpha-2</Th>
+                      <Th style={{ textAlign: "start" }}>alpha-3</Th>
+                      <Th style={{ textAlign: "start" }}>Телефон</Th>
+                      <Th style={{ textAlign: "start" }}>OSM</Th>
+                      <Th style={{ textAlign: "start" }}>Изменено</Th>
                     </Tr>
                   </Thead>
                   <Tbody>
-                    {getFilteredObjects(isDeletedIncluded)?.map((country) => (
+                    {countriesPage?.data.map((country) => (
                       <Tr
+                        key={country.id}
                         width={"100%"}
                         backgroundColor={
                           country.deleted_at ? "#f7eded" : "white"
@@ -134,7 +121,7 @@ function CountriesPage() {
                           backgroundColor={"#edf2f7"}
                           isNumeric
                         >
-                          <Flex width={"60px"} justifyContent={"space-between"}>
+                          <Flex width={"70px"} justifyContent={"space-between"}>
                             <Link
                               as={ReactRouterLink}
                               to={getCountryPagePathById(country.id)}
@@ -155,11 +142,16 @@ function CountriesPage() {
                             />
                           </Flex>
                         </Td>
-                        <Td>{country.name}</Td>
+                        <Td
+                            textOverflow={'ellipsis'}
+                            maxW={'300px'}
+                            whiteSpace={'nowrap'}
+                            overflow={'hidden'}
+                        >
+                          {country.name}
+                        </Td>
                         <Td>{country.iso3116_alpha2}</Td>
                         <Td>{country.iso3166_alpha3}</Td>
-                        <Td>{country.latitude}</Td>
-                        <Td>{country.longitude}</Td>
                         <Td>{country.phone_code}</Td>
                         <Td>
                           <Link
@@ -195,5 +187,3 @@ function CountriesPage() {
     </>
   );
 }
-
-export default CountriesPage;

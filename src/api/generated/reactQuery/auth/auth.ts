@@ -4,11 +4,15 @@
  * API Geo
  * OpenAPI spec version: 0.1.0
  */
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type {
   MutationFunction,
+  QueryFunction,
+  QueryKey,
   UseMutationOptions,
   UseMutationResult,
+  UseQueryOptions,
+  UseQueryResult,
 } from "@tanstack/react-query";
 import type {
   BodyAuthJwtLoginAuthLoginPost,
@@ -234,6 +238,380 @@ export const useRegisterRegisterAuthRegisterPost = <
 > => {
   const mutationOptions =
     getRegisterRegisterAuthRegisterPostMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+/**
+ * @summary Users:Current User
+ */
+export const usersCurrentUserAuthMeGet = (signal?: AbortSignal) => {
+  return customInstance<UserRead>({ url: `/auth/me`, method: "GET", signal });
+};
+
+export const getUsersCurrentUserAuthMeGetQueryKey = () => {
+  return [`/auth/me`] as const;
+};
+
+export const getUsersCurrentUserAuthMeGetQueryOptions = <
+  TData = Awaited<ReturnType<typeof usersCurrentUserAuthMeGet>>,
+  TError = void,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof usersCurrentUserAuthMeGet>>,
+      TError,
+      TData
+    >
+  >;
+}) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getUsersCurrentUserAuthMeGetQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof usersCurrentUserAuthMeGet>>
+  > = ({ signal }) => usersCurrentUserAuthMeGet(signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof usersCurrentUserAuthMeGet>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type UsersCurrentUserAuthMeGetQueryResult = NonNullable<
+  Awaited<ReturnType<typeof usersCurrentUserAuthMeGet>>
+>;
+export type UsersCurrentUserAuthMeGetQueryError = void;
+
+/**
+ * @summary Users:Current User
+ */
+export const useUsersCurrentUserAuthMeGet = <
+  TData = Awaited<ReturnType<typeof usersCurrentUserAuthMeGet>>,
+  TError = void,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof usersCurrentUserAuthMeGet>>,
+      TError,
+      TData
+    >
+  >;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } => {
+  const queryOptions = getUsersCurrentUserAuthMeGetQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+};
+
+/**
+ * @summary Users:Patch Current User
+ */
+export const usersPatchCurrentUserAuthMePatch = (userCreate: UserCreate) => {
+  return customInstance<UserRead>({
+    url: `/auth/me`,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    data: userCreate,
+  });
+};
+
+export const getUsersPatchCurrentUserAuthMePatchMutationOptions = <
+  TError = ErrorModel | void | HTTPValidationError,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof usersPatchCurrentUserAuthMePatch>>,
+    TError,
+    { data: UserCreate },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof usersPatchCurrentUserAuthMePatch>>,
+  TError,
+  { data: UserCreate },
+  TContext
+> => {
+  const { mutation: mutationOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof usersPatchCurrentUserAuthMePatch>>,
+    { data: UserCreate }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return usersPatchCurrentUserAuthMePatch(data);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UsersPatchCurrentUserAuthMePatchMutationResult = NonNullable<
+  Awaited<ReturnType<typeof usersPatchCurrentUserAuthMePatch>>
+>;
+export type UsersPatchCurrentUserAuthMePatchMutationBody = UserCreate;
+export type UsersPatchCurrentUserAuthMePatchMutationError =
+  | ErrorModel
+  | void
+  | HTTPValidationError;
+
+/**
+ * @summary Users:Patch Current User
+ */
+export const useUsersPatchCurrentUserAuthMePatch = <
+  TError = ErrorModel | void | HTTPValidationError,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof usersPatchCurrentUserAuthMePatch>>,
+    TError,
+    { data: UserCreate },
+    TContext
+  >;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof usersPatchCurrentUserAuthMePatch>>,
+  TError,
+  { data: UserCreate },
+  TContext
+> => {
+  const mutationOptions =
+    getUsersPatchCurrentUserAuthMePatchMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+/**
+ * @summary Users:User
+ */
+export const usersUserAuthIdGet = (id: string, signal?: AbortSignal) => {
+  return customInstance<UserRead>({
+    url: `/auth/${id}`,
+    method: "GET",
+    signal,
+  });
+};
+
+export const getUsersUserAuthIdGetQueryKey = (id: string) => {
+  return [`/auth/${id}`] as const;
+};
+
+export const getUsersUserAuthIdGetQueryOptions = <
+  TData = Awaited<ReturnType<typeof usersUserAuthIdGet>>,
+  TError = void | HTTPValidationError,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof usersUserAuthIdGet>>,
+        TError,
+        TData
+      >
+    >;
+  },
+) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getUsersUserAuthIdGetQueryKey(id);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof usersUserAuthIdGet>>
+  > = ({ signal }) => usersUserAuthIdGet(id, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!id,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof usersUserAuthIdGet>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type UsersUserAuthIdGetQueryResult = NonNullable<
+  Awaited<ReturnType<typeof usersUserAuthIdGet>>
+>;
+export type UsersUserAuthIdGetQueryError = void | HTTPValidationError;
+
+/**
+ * @summary Users:User
+ */
+export const useUsersUserAuthIdGet = <
+  TData = Awaited<ReturnType<typeof usersUserAuthIdGet>>,
+  TError = void | HTTPValidationError,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof usersUserAuthIdGet>>,
+        TError,
+        TData
+      >
+    >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } => {
+  const queryOptions = getUsersUserAuthIdGetQueryOptions(id, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+};
+
+/**
+ * @summary Users:Patch User
+ */
+export const usersPatchUserAuthIdPatch = (
+  id: string,
+  userCreate: UserCreate,
+) => {
+  return customInstance<UserRead>({
+    url: `/auth/${id}`,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    data: userCreate,
+  });
+};
+
+export const getUsersPatchUserAuthIdPatchMutationOptions = <
+  TError = ErrorModel | void | HTTPValidationError,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof usersPatchUserAuthIdPatch>>,
+    TError,
+    { id: string; data: UserCreate },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof usersPatchUserAuthIdPatch>>,
+  TError,
+  { id: string; data: UserCreate },
+  TContext
+> => {
+  const { mutation: mutationOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof usersPatchUserAuthIdPatch>>,
+    { id: string; data: UserCreate }
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return usersPatchUserAuthIdPatch(id, data);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UsersPatchUserAuthIdPatchMutationResult = NonNullable<
+  Awaited<ReturnType<typeof usersPatchUserAuthIdPatch>>
+>;
+export type UsersPatchUserAuthIdPatchMutationBody = UserCreate;
+export type UsersPatchUserAuthIdPatchMutationError =
+  | ErrorModel
+  | void
+  | HTTPValidationError;
+
+/**
+ * @summary Users:Patch User
+ */
+export const useUsersPatchUserAuthIdPatch = <
+  TError = ErrorModel | void | HTTPValidationError,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof usersPatchUserAuthIdPatch>>,
+    TError,
+    { id: string; data: UserCreate },
+    TContext
+  >;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof usersPatchUserAuthIdPatch>>,
+  TError,
+  { id: string; data: UserCreate },
+  TContext
+> => {
+  const mutationOptions = getUsersPatchUserAuthIdPatchMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+/**
+ * @summary Users:Delete User
+ */
+export const usersDeleteUserAuthIdDelete = (id: string) => {
+  return customInstance<void>({ url: `/auth/${id}`, method: "DELETE" });
+};
+
+export const getUsersDeleteUserAuthIdDeleteMutationOptions = <
+  TError = void | HTTPValidationError,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof usersDeleteUserAuthIdDelete>>,
+    TError,
+    { id: string },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof usersDeleteUserAuthIdDelete>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  const { mutation: mutationOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof usersDeleteUserAuthIdDelete>>,
+    { id: string }
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return usersDeleteUserAuthIdDelete(id);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UsersDeleteUserAuthIdDeleteMutationResult = NonNullable<
+  Awaited<ReturnType<typeof usersDeleteUserAuthIdDelete>>
+>;
+
+export type UsersDeleteUserAuthIdDeleteMutationError =
+  void | HTTPValidationError;
+
+/**
+ * @summary Users:Delete User
+ */
+export const useUsersDeleteUserAuthIdDelete = <
+  TError = void | HTTPValidationError,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof usersDeleteUserAuthIdDelete>>,
+    TError,
+    { id: string },
+    TContext
+  >;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof usersDeleteUserAuthIdDelete>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  const mutationOptions =
+    getUsersDeleteUserAuthIdDeleteMutationOptions(options);
 
   return useMutation(mutationOptions);
 };

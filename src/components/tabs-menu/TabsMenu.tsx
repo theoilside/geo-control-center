@@ -18,7 +18,6 @@ function TabsMenu({ ...props }: TabsMenuProps) {
           <Tab isDisabled>Города</Tab>
           <Tab isDisabled>Аэропорты</Tab>
           <Tab isDisabled>Ж/д-станции</Tab>
-          <Tab isDisabled>Станции метро</Tab>
         </TabList>
       </Tabs>
     </Flex>

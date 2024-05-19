@@ -18,15 +18,20 @@ type TableHeaderProps = {
   isEditingAvailable: boolean;
   isMapAvailable: boolean;
   isSearchAvailable: boolean;
+  isSearchByParentObjectIdAvailable: boolean;
   onDeletedFlagChange: () => void;
   getObjectPagePathById: (objectId: number) => string;
   handleSearch: (term: string | null) => void;
+  handleChangeParentObjectId?: (parentObjectId: string | null) => void;
+  parentObjectName?: string;
+  parentObjectId?: string | null;
 };
 
 function TableHeader({ ...props }: TableHeaderProps) {
   const [goToIdValue, setGoToIdValue] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string | null>(null);
+  const [parentObjectId, setParentObjectId] = useState<string | null>(props.parentObjectId ?? null);
   const [isDrawerOpened, setIsDrawerOpened] = useState(false);
   const navigate = useNavigate();
   const isGoToIdValueInvalid: boolean = false;
@@ -37,13 +42,9 @@ function TableHeader({ ...props }: TableHeaderProps) {
 
   const handleGoToId = (goToIdValue: string | null) => {
     if (goToIdValue) {
-      try {
         const objectId = parseInt(goToIdValue);
         navigate(props.getObjectPagePathById(objectId));
-      } finally {
-        console.log("Неправильный тип в goToId");
       }
-    }
   };
 
   useEffect(() => {
@@ -60,6 +61,11 @@ function TableHeader({ ...props }: TableHeaderProps) {
     props.handleSearch(term);
   };
 
+  const handleSearchByParentObjectId = (parentObjectId: string | null) => {
+    if (props.handleChangeParentObjectId)
+      props.handleChangeParentObjectId(parentObjectId);
+  };
+
   const handleIsDrawerOpened = () => {
     setIsDrawerOpened(!isDrawerOpened);
   };
@@ -71,7 +77,7 @@ function TableHeader({ ...props }: TableHeaderProps) {
         handleOpenedState={(isOpened) => setIsDrawerOpened(isOpened)}
       />
       <HStack spacing={"20px"} flexGrow={1}>
-        <InputGroup maxW={"120px"}>
+        <InputGroup minW={'100px'} maxW={"130px"} width={'20%'}>
           <Input
             onChange={handleGoToIdValueChange}
             type={'number'}
@@ -95,11 +101,36 @@ function TableHeader({ ...props }: TableHeaderProps) {
             />
           </InputRightElement>
         </InputGroup>
+        {props.isSearchByParentObjectIdAvailable && (
+            <InputGroup minW={'140px'} maxW={"160px"} width={'20%'}>
+              <Input
+                  onChange={(event) => setParentObjectId(event.target.value)}
+                  value={parentObjectId ? parentObjectId : undefined}
+                  placeholder={`ID ${props.parentObjectName}`}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      handleSearchByParentObjectId(parentObjectId);
+                    }
+                  }}
+              />
+              <InputRightElement>
+                <IconButton
+                    onClick={() => handleSearchByParentObjectId(parentObjectId)}
+                    aria-label={"Поиск"}
+                    icon={<BiSearch />}
+                    colorScheme="gray"
+                    variant="ghost"
+                    h="1.85rem"
+                    size="sm"
+                />
+              </InputRightElement>
+            </InputGroup>
+        )}
         {props.isSearchAvailable && (
-          <InputGroup maxW={"270px"}>
+          <InputGroup maxW={"270px"} width={'30%'}>
             <Input
               onChange={(event) => setSearchQuery(event.target.value)}
-              value={searchQuery as string}
+              value={searchQuery ? searchQuery : undefined}
               placeholder="Поиск"
               onKeyDown={(e) => {
                 if (e.key === "Enter") {

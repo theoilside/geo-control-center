@@ -6,7 +6,6 @@
  */
 import type { RailwayUpdateCityId } from "./railwayUpdateCityId";
 import type { RailwayUpdateCountryId } from "./railwayUpdateCountryId";
-import type { RailwayUpdateDeletedAt } from "./railwayUpdateDeletedAt";
 import type { RailwayUpdateExpress3Code } from "./railwayUpdateExpress3Code";
 import type { RailwayUpdateIsMain } from "./railwayUpdateIsMain";
 import type { RailwayUpdateLatitude } from "./railwayUpdateLatitude";
@@ -21,7 +20,6 @@ import type { RailwayUpdateTimezone } from "./railwayUpdateTimezone";
 export interface RailwayUpdate {
   city_id?: RailwayUpdateCityId;
   country_id?: RailwayUpdateCountryId;
-  deleted_at?: RailwayUpdateDeletedAt;
   express3_code?: RailwayUpdateExpress3Code;
   is_main?: RailwayUpdateIsMain;
   latitude?: RailwayUpdateLatitude;

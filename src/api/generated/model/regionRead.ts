@@ -4,11 +4,13 @@
  * API Geo
  * OpenAPI spec version: 0.1.0
  */
+import type { RegionReadDeletedAt } from "./regionReadDeletedAt";
 import type { RegionReadLastUpdatedAt } from "./regionReadLastUpdatedAt";
 import type { RegionReadNeedAutomaticUpdate } from "./regionReadNeedAutomaticUpdate";
 
 export interface RegionRead {
   country_id: number;
+  deleted_at?: RegionReadDeletedAt;
   id: number;
   last_updated_at: RegionReadLastUpdatedAt;
   latitude: number;

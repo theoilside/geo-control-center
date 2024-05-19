@@ -6,14 +6,43 @@ import {
   HStack,
   Image,
   VStack,
+  Text,
+  Card,
+  useToast,
 } from "@chakra-ui/react";
 import { COUNTRIES_PAGE } from "../../routes/route-paths.ts";
 import logo from "../../assets/images/logo.png";
-import LoginButton from "../components/LoginButton";
+import { LoginButton } from "./LoginButton.tsx";
+import {
+  useAuthJwtLogoutAuthLogoutPost,
+  useUsersCurrentUserAuthMeGet,
+} from "../../api/generated/reactQuery/auth/auth.ts";
+import { LogoutButton } from "./LogoutButton.tsx";
+import { queryClient } from "../../main.tsx";
 
-function Header() {
+export default function Header() {
+  const { data: currentUserData } = useUsersCurrentUserAuthMeGet();
+  const { mutateAsync: postLogout } = useAuthJwtLogoutAuthLogoutPost();
+  const toast = useToast();
+  console.log("Ререндер:", currentUserData);
+
+  const handleLogout = async () => {
+    await postLogout();
+    await queryClient.invalidateQueries({
+      queryKey: [`/auth/me`],
+    });
+    toast({
+      description: "Вы вышли из аккаунта",
+      variant: "subtle",
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    });
+    console.log("handleLogout:", currentUserData);
+  };
+
   return (
-    <VStack padding={"16px 0 16px 0"} as={"header"} maxW={"100%"} gap={"16px"}>
+    <VStack padding={"16px 0 16px 0"} as={"header"} maxW={"100vw"} gap={"16px"}>
       <Flex
         w={"100%"}
         wrap={"nowrap"}
@@ -28,11 +57,20 @@ function Header() {
             </Heading>
           </HStack>
         </Link>
-        <LoginButton />
+        {currentUserData ? (
+          <HStack spacing={"10px"}>
+            <Card padding={"4px 10px"} variant={"outline"}>
+              <Text color={"gray.700"} fontSize={"sm"}>
+                {currentUserData.email}
+              </Text>
+            </Card>
+            <LogoutButton handleLogout={handleLogout} />
+          </HStack>
+        ) : (
+          <LoginButton />
+        )}
       </Flex>
       <Divider />
     </VStack>
   );
 }
-
-export default Header;

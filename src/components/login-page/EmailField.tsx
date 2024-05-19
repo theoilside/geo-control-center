@@ -1,10 +1,22 @@
 import { FormControl, FormLabel, Input } from "@chakra-ui/react";
+import {BodyAuthJwtLoginAuthLoginPost} from "../../api/generated/model";
 
-function EmailField() {
+type EmailFieldProps = {
+    handleFormChange: ((form: Partial<BodyAuthJwtLoginAuthLoginPost>) => void);
+}
+
+function EmailField({...props}: EmailFieldProps) {
   return (
     <FormControl>
       <FormLabel htmlFor="email">Почта</FormLabel>
-      <Input size={"md"} id="email" type="email" placeholder="Введите почту" />
+      <Input
+          onChange={(e) => props.handleFormChange({ username: e.target.value })}
+          size={"md"}
+          id="email"
+          type="email"
+          placeholder="Введите почту"
+          defaultValue={'theoilside@gmail.com'}
+      />
     </FormControl>
   );
 }

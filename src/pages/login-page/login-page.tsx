@@ -10,14 +10,46 @@ import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
+  useToast,
 } from "@chakra-ui/react";
 import PasswordField from "../../components/login-page/PasswordField.tsx";
 import EmailField from "../../components/login-page/EmailField.tsx";
 import { BiRocket } from "react-icons/bi";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { COUNTRIES_PAGE } from "../../routes/route-paths.ts";
+import { useState } from "react";
+import { useAuthJwtLoginAuthLoginPost } from "../../api/generated/reactQuery/auth/auth.ts";
+import { BodyAuthJwtLoginAuthLoginPost } from "../../api/generated/model";
+import { queryClient } from "../../main.tsx";
 
 function LoginPage() {
+  const [loginForm, setLoginForm] =
+    useState<Partial<BodyAuthJwtLoginAuthLoginPost>>();
+  const navigate = useNavigate();
+  const toast = useToast();
+
+  const { mutateAsync } = useAuthJwtLoginAuthLoginPost({
+    mutation: {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries({
+          queryKey: [`/auth/me`],
+        });
+        toast({
+          description: "Вы вошли в аккаунт",
+          variant: "subtle",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+        navigate(COUNTRIES_PAGE);
+      },
+    },
+  });
+
+  function handleSetLoginForm(newForm: Partial<BodyAuthJwtLoginAuthLoginPost>) {
+    setLoginForm((prevState) => ({ ...prevState, ...newForm }));
+  }
+
   return (
     <VStack width={"100%"} spacing={"20px"} align={"left"}>
       <Breadcrumb fontWeight="medium" fontSize="md">
@@ -36,11 +68,20 @@ function LoginPage() {
       <Box className="login-container" width={"33%"}>
         <Stack spacing="6">
           <Stack spacing="5">
-            <EmailField />
-            <PasswordField />
+            <EmailField handleFormChange={handleSetLoginForm} />
+            <PasswordField handleFormChange={handleSetLoginForm} />
           </Stack>
           <Stack spacing="3">
-            <Button size={"md"} colorScheme={"orange"} type="submit">
+            <Button
+              onClick={() =>
+                mutateAsync({
+                  data: loginForm as BodyAuthJwtLoginAuthLoginPost,
+                })
+              }
+              size={"md"}
+              colorScheme={"orange"}
+              type="submit"
+            >
               Войти
             </Button>
             <HStack>

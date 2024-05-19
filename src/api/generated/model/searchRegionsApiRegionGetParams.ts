@@ -7,6 +7,8 @@
 
 export type SearchRegionsApiRegionGetParams = {
   term?: string | null;
+  country_id?: string | null;
+  include_deleted?: boolean | null;
   page_number?: number;
   page_size?: number;
 };

@@ -10,12 +10,15 @@ import {
   VStack,
   ScaleFade,
   Fade,
-  Skeleton,
+  Skeleton, useToast,
 } from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom";
 import { COUNTRIES_PAGE } from "../../../routes/route-paths.ts";
 import ErrorPage from "../../error-page/error-page.tsx";
-import { useGetCountryByIdApiCountryIdGet } from "../../../api/generated/reactQuery/country/country.ts";
+import {
+  useGetCountryByIdApiCountryIdGet,
+  useUpdateCountryApiCountryIdPatch
+} from "../../../api/generated/reactQuery/country/country.ts";
 import { useObjectId } from "../../../hooks/useObjectId.ts";
 import { RowObjectInfo } from "../../../components/object-page/RowObjectInfo.tsx";
 import { RowObjectInfoLink } from "../../../components/object-page/RowObjectInfoLink.tsx";
@@ -26,11 +29,29 @@ import {timeSince} from "../../../components/timeSince.ts";
 
 function CountryPage() {
   const countryIndex = useObjectId();
+  const toast = useToast();
   const { data: country, isLoading, refetch, error } =
     useGetCountryByIdApiCountryIdGet(countryIndex);
+  const { mutateAsync } = useUpdateCountryApiCountryIdPatch();
+
   if (error) {
     return <ErrorPage />;
   }
+
+  const handleChangeAutoUpdatable = async () => {
+    await mutateAsync({ id: countryIndex, data: { need_automatic_update: !country?.need_automatic_update } })
+        .then(() => {
+          refetch();
+          toast({
+            description: `Автообновление успешно ${country ? (country.need_automatic_update ? 'выключено' : 'включено') : 'изменено'}`,
+            status: "success",
+            duration: 3000,
+          });
+        })
+        .catch((error) => {
+          console.error("Failed to change auto updatable property:", error);
+        });
+  };
 
   return (
     <VStack width={"100%"} spacing={"20px"} align={"left"}>
@@ -50,14 +71,18 @@ function CountryPage() {
         <Flex gap={"10px"}>
           <Card variant={"outline"} flexGrow={1}>
             <HeaderWithAction
-                title={country?.name}
+                objectTitle={country?.name}
                 objectType={'Страна'}
+                objectId={country?.id}
+                objectCode={country?.iso3116_alpha2}
                 isAutoUpdatable={country?.need_automatic_update}
                 deletedAt={formatDate(country?.deleted_at as string)}
                 deletedAgo={timeSince(country?.deleted_at as string)}
                 lastEditedAt={formatDate(country?.last_updated_at)}
                 lastEditedAgo={timeSince(country?.last_updated_at)}
-                refetchFunction={refetch} />
+                refetchFunction={refetch}
+                changeAutoUpdatableFunction={handleChangeAutoUpdatable}
+            />
             <CardBody>
               <Stack divider={<StackDivider />} spacing="4">
                 <RowObjectInfo
@@ -70,15 +95,19 @@ function CountryPage() {
                   content={country?.iso3166_alpha3}
                   tooltip={'ISO 3166'}
                 />
-                <RowObjectInfo
-                  title={"Телефонный код"}
-                  content={country?.phone_code}
-                />
-                <RowObjectInfo
-                    title={"Телефонная маска"}
-                    content={country?.phone_mask}
-                    tooltip={'. — любая цифра'}
-                />
+                {country?.phone_code &&
+                    <RowObjectInfo
+                        title={"Телефонный код"}
+                        content={country?.phone_code}
+                    />
+                }
+                {country?.phone_mask &&
+                    <RowObjectInfo
+                        title={"Телефонная маска"}
+                        content={country?.phone_mask}
+                        tooltip={'. — любая цифра'}
+                    />
+                }
                 <RowObjectInfoLink
                   title={"OSM (Nominatim)"}
                   link={`https://nominatim.openstreetmap.org/ui/details.html?osmtype=${country?.osm_type}&osmid=${country?.osm_id}`}

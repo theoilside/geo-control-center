@@ -7,6 +7,7 @@
 
 export type SearchCountriesApiCountryGetParams = {
   term?: string | null;
+  include_deleted?: boolean | null;
   page_number?: number;
   page_size?: number;
 };

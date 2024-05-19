@@ -6,6 +6,8 @@
  */
 import type { CountryReadDeletedAt } from "./countryReadDeletedAt";
 import type { CountryReadNeedAutomaticUpdate } from "./countryReadNeedAutomaticUpdate";
+import type { CountryReadPhoneCode } from "./countryReadPhoneCode";
+import type { CountryReadPhoneMask } from "./countryReadPhoneMask";
 
 export interface CountryRead {
   deleted_at: CountryReadDeletedAt;
@@ -16,9 +18,9 @@ export interface CountryRead {
   latitude: number;
   longitude: number;
   name: string;
-  need_automatic_update?: CountryReadNeedAutomaticUpdate;
+  need_automatic_update: CountryReadNeedAutomaticUpdate;
   osm_id: string;
   osm_type: string;
-  phone_code: string;
-  phone_mask: string;
+  phone_code: CountryReadPhoneCode;
+  phone_mask: CountryReadPhoneMask;
 }

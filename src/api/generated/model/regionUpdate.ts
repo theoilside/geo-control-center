@@ -4,6 +4,7 @@
  * API Geo
  * OpenAPI spec version: 0.1.0
  */
+import type { RegionUpdateDeletedAt } from "./regionUpdateDeletedAt";
 import type { RegionUpdateLatitude } from "./regionUpdateLatitude";
 import type { RegionUpdateLongitude } from "./regionUpdateLongitude";
 import type { RegionUpdateName } from "./regionUpdateName";
@@ -13,6 +14,7 @@ import type { RegionUpdateOsmType } from "./regionUpdateOsmType";
 import type { RegionUpdateRegionId } from "./regionUpdateRegionId";
 
 export interface RegionUpdate {
+  deleted_at?: RegionUpdateDeletedAt;
   latitude?: RegionUpdateLatitude;
   longitude?: RegionUpdateLongitude;
   name?: RegionUpdateName;

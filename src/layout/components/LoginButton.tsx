@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { LOGIN_PAGE } from "../../routes/route-paths.ts";
 import { BiLockOpenAlt } from "react-icons/bi";
 
-function LoginButton() {
+export function LoginButton() {
   const navigate = useNavigate();
   return (
     <Button
@@ -17,5 +17,3 @@ function LoginButton() {
     </Button>
   );
 }
-
-export default LoginButton;
