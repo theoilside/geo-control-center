@@ -21,14 +21,13 @@ import { LogoutButton } from "./LogoutButton.tsx";
 import { queryClient } from "../../main.tsx";
 
 export default function Header() {
-  const { data: currentUserData } = useUsersCurrentUserAuthMeGet();
+  const { data: currentUserData, isError } = useUsersCurrentUserAuthMeGet();
   const { mutateAsync: postLogout } = useAuthJwtLogoutAuthLogoutPost();
   const toast = useToast();
-  console.log("Ререндер:", currentUserData);
 
   const handleLogout = async () => {
     await postLogout();
-    await queryClient.invalidateQueries({
+    await queryClient.resetQueries({
       queryKey: [`/auth/me`],
     });
     toast({
@@ -38,7 +37,6 @@ export default function Header() {
       duration: 3000,
       isClosable: true,
     });
-    console.log("handleLogout:", currentUserData);
   };
 
   return (
@@ -57,7 +55,7 @@ export default function Header() {
             </Heading>
           </HStack>
         </Link>
-        {currentUserData ? (
+        {currentUserData && !isError ? (
           <HStack spacing={"10px"}>
             <Card padding={"4px 10px"} variant={"outline"}>
               <Text color={"gray.700"} fontSize={"sm"}>

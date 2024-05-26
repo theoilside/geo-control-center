@@ -11,7 +11,7 @@ export function RowObjectInfo({...props}: RowObjectInfoProps) {
     return (
       <Box>
         <HStack spacing={"8px"}>
-          <Heading size="xs" textTransform="uppercase">
+          <Heading size="xs">
             {props.title}
           </Heading>
           {props.tooltip && (

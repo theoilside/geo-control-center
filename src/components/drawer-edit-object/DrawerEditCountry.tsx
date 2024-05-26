@@ -1,4 +1,4 @@
-import { CountryCreate } from "../../api/generated/model";
+import { CountryUpdate } from "../../api/generated/model";
 import {
   Box,
   Button,
@@ -12,57 +12,71 @@ import {
   FormLabel,
   Input,
   Stack,
-  Switch,
+  useToast,
 } from "@chakra-ui/react";
-import { useRef, useState } from "react";
-import { useAddCountryApiCountryPost } from "../../api/generated/reactQuery/country/country.ts";
-import { useNavigate } from "react-router-dom";
-import { getCountryPagePathById } from "../../routes/routes.ts";
+import { useState } from "react";
+import {
+  useGetCountryByIdApiCountryIdGet,
+  useUpdateCountryApiCountryIdPatch,
+} from "../../api/generated/reactQuery/country/country.ts";
+import { useObjectId } from "../../hooks/useObjectId.ts";
+import { QueryObserverResult, RefetchOptions } from "@tanstack/react-query";
+import { HTTPValidationError } from "../../api/modals.ts";
+import { ObjectRead } from "../../types/ObjectRead.ts";
 
-type DrawerAddObjectProps = {
+type DrawerEditCountryProps = {
   isOpened: boolean;
   handleOpenedState: (isOpened: boolean) => void;
-}
+  refetchFunction: (
+    options?: RefetchOptions | undefined,
+  ) => Promise<QueryObserverResult<ObjectRead, HTTPValidationError>>;
+};
 
-export function DrawerAddObject({...props}: DrawerAddObjectProps) {
-  const firstField = useRef(null);
-  const navigate = useNavigate();
-  const [form, setForm] = useState<Partial<CountryCreate>>({
-    need_automatic_update: false,
-  });
-  const { mutateAsync } = useAddCountryApiCountryPost({
-    mutation: {
-      onSuccess: (data) => {
-        navigate(getCountryPagePathById(data.id));
-      },
-    },
-  });
+export function DrawerEditCountry({ ...props }: DrawerEditCountryProps) {
+  const [form, setForm] = useState<CountryUpdate>();
+  const { mutateAsync } = useUpdateCountryApiCountryIdPatch();
+  const countryIndex = useObjectId();
+  const toast = useToast();
+  const { data: country } = useGetCountryByIdApiCountryIdGet(countryIndex);
 
-  const updateForm = (newValue: Partial<CountryCreate>) => {
+  const updateForm = (newValue: CountryUpdate) => {
     setForm((prevState) => ({ ...prevState, ...newValue }));
+  };
+
+  const handleSubmit = async (form: CountryUpdate | undefined) => {
+    await mutateAsync({ id: countryIndex, data: form as CountryUpdate })
+      .then(() => {
+        props.refetchFunction();
+        props.handleOpenedState(false);
+        toast({
+          description: "Объект успешно отредактирован",
+          status: "success",
+          duration: 3000,
+        });
+      })
+      .catch((error) => {
+        console.error("Failed to update:", error);
+      });
   };
 
   return (
     <Drawer
       isOpen={props.isOpened}
       placement="right"
-      initialFocusRef={firstField}
       onClose={() => props.handleOpenedState(false)}
       size={"lg"}
     >
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton />
-        <DrawerHeader borderBottomWidth="1px">
-          Добавить новую страну
-        </DrawerHeader>
+        <DrawerHeader borderBottomWidth="1px">Редактировать</DrawerHeader>
         <DrawerBody>
           <Stack spacing="24px">
             <Box>
               <FormLabel htmlFor="name">Название</FormLabel>
               <Input
                 onChange={(e) => updateForm({ name: e.target.value })}
-                ref={firstField}
+                defaultValue={country?.name}
                 id="name"
                 placeholder="Введите название страны"
               />
@@ -71,6 +85,7 @@ export function DrawerAddObject({...props}: DrawerAddObjectProps) {
               <FormLabel htmlFor="code_alpha2">Код (alpha-2)</FormLabel>
               <Input
                 onChange={(e) => updateForm({ iso3116_alpha2: e.target.value })}
+                defaultValue={country?.iso3116_alpha2}
                 id="code_alpha2"
                 placeholder="Введите двухбуквенный код страны"
               />
@@ -79,6 +94,7 @@ export function DrawerAddObject({...props}: DrawerAddObjectProps) {
               <FormLabel htmlFor="code_alpha3">Код (alpha-3)</FormLabel>
               <Input
                 onChange={(e) => updateForm({ iso3166_alpha3: e.target.value })}
+                defaultValue={country?.iso3166_alpha3}
                 id="code_alpha3"
                 placeholder="Введите трехбуквенный код страны"
               />
@@ -86,25 +102,28 @@ export function DrawerAddObject({...props}: DrawerAddObjectProps) {
             <Box>
               <FormLabel htmlFor="latitude">Широта</FormLabel>
               <Input
-                  onChange={(e) => updateForm({ latitude: +e.target.value })}
-                  id="latitude"
-                  type={"number"}
-                  placeholder="Введите широту центральной точки страны"
+                onChange={(e) => updateForm({ latitude: +e.target.value })}
+                defaultValue={country?.latitude}
+                id="latitude"
+                type={"number"}
+                placeholder="Введите широту центральной точки страны"
               />
             </Box>
             <Box>
               <FormLabel htmlFor="longitude">Долгота</FormLabel>
               <Input
-                  onChange={(e) => updateForm({ longitude: +e.target.value })}
-                  id="longitude"
-                  type={"number"}
-                  placeholder="Введите долготу центральной точки страны"
+                onChange={(e) => updateForm({ longitude: +e.target.value })}
+                defaultValue={country?.longitude}
+                id="longitude"
+                type={"number"}
+                placeholder="Введите долготу центральной точки страны"
               />
             </Box>
             <Box>
               <FormLabel htmlFor="osm_type">Тип OSM</FormLabel>
               <Input
                 onChange={(e) => updateForm({ osm_type: e.target.value })}
+                defaultValue={country?.osm_type}
                 id="osm_type"
                 placeholder="Введите тип OSM"
               />
@@ -113,6 +132,7 @@ export function DrawerAddObject({...props}: DrawerAddObjectProps) {
               <FormLabel htmlFor="osm_id">OSM ID</FormLabel>
               <Input
                 onChange={(e) => updateForm({ osm_id: e.target.value })}
+                defaultValue={country?.osm_id}
                 id="osm_id"
                 placeholder="Введите OSM ID"
               />
@@ -121,6 +141,9 @@ export function DrawerAddObject({...props}: DrawerAddObjectProps) {
               <FormLabel htmlFor="phone_code">Телефонный код</FormLabel>
               <Input
                 onChange={(e) => updateForm({ phone_code: e.target.value })}
+                defaultValue={
+                  country?.phone_code ? country.phone_code : undefined
+                }
                 id="phone_code"
                 placeholder="Введите телефонный код"
               />
@@ -129,30 +152,25 @@ export function DrawerAddObject({...props}: DrawerAddObjectProps) {
               <FormLabel htmlFor="phone_mask">Телефонная маска</FormLabel>
               <Input
                 onChange={(e) => updateForm({ phone_mask: e.target.value })}
+                defaultValue={
+                  country?.phone_mask ? country.phone_mask : undefined
+                }
                 id="phone_mask"
                 placeholder="Введите телефонную маску"
-              />
-            </Box>
-            <Box>
-              <FormLabel htmlFor="need_automatic_update" mb="0">
-                Включить автообновление?
-              </FormLabel>
-              <Switch
-                onChange={(e) => console.log(e)}
-                id="need_automatic_update"
               />
             </Box>
           </Stack>
         </DrawerBody>
         <DrawerFooter borderTopWidth="1px">
-          <Button variant="outline" mr={3} onClick={() => props.handleOpenedState(false)}>
+          <Button
+            variant="outline"
+            mr={3}
+            onClick={() => props.handleOpenedState(false)}
+          >
             Отменить
           </Button>
-          <Button
-            colorScheme="orange"
-            onClick={() => mutateAsync({ data: form as CountryCreate })}
-          >
-            Добавить
+          <Button colorScheme="orange" onClick={() => handleSubmit(form)}>
+            Сохранить
           </Button>
         </DrawerFooter>
       </DrawerContent>

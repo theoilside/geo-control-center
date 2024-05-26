@@ -17,18 +17,19 @@ import EmailField from "../../components/login-page/EmailField.tsx";
 import { BiRocket } from "react-icons/bi";
 import { Link, useNavigate } from "react-router-dom";
 import { COUNTRIES_PAGE } from "../../routes/route-paths.ts";
-import { useState } from "react";
-import { useAuthJwtLoginAuthLoginPost } from "../../api/generated/reactQuery/auth/auth.ts";
+import {useEffect, useState} from "react";
+import {useAuthJwtLoginAuthLoginPost, useUsersCurrentUserAuthMeGet} from "../../api/generated/reactQuery/auth/auth.ts";
 import { BodyAuthJwtLoginAuthLoginPost } from "../../api/generated/model";
 import { queryClient } from "../../main.tsx";
 
 function LoginPage() {
   const [loginForm, setLoginForm] =
     useState<Partial<BodyAuthJwtLoginAuthLoginPost>>();
+  const { data: currentUserData, isError: isErrorGettingCurrentUser } = useUsersCurrentUserAuthMeGet();
   const navigate = useNavigate();
   const toast = useToast();
 
-  const { mutateAsync } = useAuthJwtLoginAuthLoginPost({
+  const { mutateAsync, isError: isErrorLoggingIn } = useAuthJwtLoginAuthLoginPost({
     mutation: {
       onSuccess: async () => {
         await queryClient.invalidateQueries({
@@ -39,16 +40,30 @@ function LoginPage() {
           variant: "subtle",
           status: "success",
           duration: 3000,
-          isClosable: true,
         });
         navigate(COUNTRIES_PAGE);
       },
+      onError: async () => {
+        toast({
+          description: "Проверьте введенные данные",
+          variant: "subtle",
+          status: "error",
+          duration: 3000,
+        });
+      }
     },
   });
 
   function handleSetLoginForm(newForm: Partial<BodyAuthJwtLoginAuthLoginPost>) {
     setLoginForm((prevState) => ({ ...prevState, ...newForm }));
   }
+
+  useEffect(() => {
+    if (currentUserData && !isErrorGettingCurrentUser) {
+      navigate(COUNTRIES_PAGE);
+    }
+  }, [navigate, currentUserData, isErrorGettingCurrentUser]);
+
 
   return (
     <VStack width={"100%"} spacing={"20px"} align={"left"}>
@@ -68,8 +83,8 @@ function LoginPage() {
       <Box className="login-container" width={"33%"}>
         <Stack spacing="6">
           <Stack spacing="5">
-            <EmailField handleFormChange={handleSetLoginForm} />
-            <PasswordField handleFormChange={handleSetLoginForm} />
+            <EmailField handleFormChange={handleSetLoginForm} isInvalid={isErrorLoggingIn} />
+            <PasswordField handleFormChange={handleSetLoginForm} isInvalid={isErrorLoggingIn} />
           </Stack>
           <Stack spacing="3">
             <Button

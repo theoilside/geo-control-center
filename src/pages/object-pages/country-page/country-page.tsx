@@ -26,6 +26,11 @@ import Map from "../../../components/map/map.tsx";
 import {HeaderWithAction} from "../../../components/object-page/HeaderWithActions.tsx";
 import {formatDate} from "../../../components/formatDate.ts";
 import {timeSince} from "../../../components/timeSince.ts";
+import {RowObjectTranslationsInfo} from "../../../components/object-page/RowObjectTranslationsInfo.tsx";
+import {
+  useGetLanguagesApiTranslateLanguageGet,
+  useGetTranslateByIdApiTranslateGet
+} from "../../../api/generated/reactQuery/translate/translate.ts";
 
 function CountryPage() {
   const countryIndex = useObjectId();
@@ -33,6 +38,15 @@ function CountryPage() {
   const { data: country, isLoading, refetch, error } =
     useGetCountryByIdApiCountryIdGet(countryIndex);
   const { mutateAsync } = useUpdateCountryApiCountryIdPatch();
+  const { data: translations, refetch: refetchTranslations } = useGetTranslateByIdApiTranslateGet({
+    entity: "country",
+    entity_id: country?.id ?? 1,
+  });
+  const {data: languages} = useGetLanguagesApiTranslateLanguageGet();
+
+  function updateTranslations() {
+    refetchTranslations();
+  }
 
   if (error) {
     return <ErrorPage />;
@@ -112,6 +126,11 @@ function CountryPage() {
                   title={"OSM (Nominatim)"}
                   link={`https://nominatim.openstreetmap.org/ui/details.html?osmtype=${country?.osm_type}&osmid=${country?.osm_id}`}
                   content={`${country?.osm_type}${country?.osm_id}`}
+                />
+                <RowObjectTranslationsInfo
+                  translations={translations}
+                  refetchTranslations={updateTranslations}
+                  languages={languages}
                 />
               </Stack>
             </CardBody>

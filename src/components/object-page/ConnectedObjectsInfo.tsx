@@ -36,12 +36,12 @@ export function ConnectedObjectsInfo({ ...props }: ConnectedObjectsInfoProps) {
                 {props.connectedObjects.map((object) => (
                   <Card
                     key={object.id}
-                    variant={"filled"}
+                    variant={"outline"}
                     padding={"8px 16px"}
-                    backgroundColor={"gray.100"}
                     height={"58px"}
                     onClick={() => navigate(`${props.goToObjectLink}${object.id}`)}
                     style={{cursor: 'pointer'}}
+                    _hover={{backgroundColor: '#fffaf5'}}
                   >
                     <Text fontSize={"xs"}>
                       {props.connectedObjectsTypeName} #{object.id}

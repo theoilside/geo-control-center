@@ -10,7 +10,7 @@ type RowObjectInfoLinkProps = {
 export function RowObjectInfoLink({...props}: RowObjectInfoLinkProps) {
     return (
         <Box>
-            <Heading size="xs" textTransform="uppercase">
+            <Heading size="xs">
                 {props.title}
             </Heading>
             <Text pt="2" fontSize="sm">

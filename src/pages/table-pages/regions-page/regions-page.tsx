@@ -27,6 +27,7 @@ import { formatDate } from "../../../components/formatDate.ts";
 import { Pagination } from "../../../components/table/Pagination.tsx";
 import { NotFound } from "../../../components/table/NotFound.tsx";
 import { useSearchRegionsApiRegionGet } from "../../../api/generated/reactQuery/region/region.ts";
+import { useUsersCurrentUserAuthMeGet } from "../../../api/generated/reactQuery/auth/auth.ts";
 
 function RegionsPage() {
   const [searchParams] = useSearchParams();
@@ -38,7 +39,8 @@ function RegionsPage() {
     newCountryId ?? null,
   );
   const navigate = useNavigate();
-  const currentUser = null;
+  const { data: currentUserData, isError: isErrorGettingCurrentUser } =
+    useUsersCurrentUserAuthMeGet();
 
   const { data: regionsPage, isLoading } = useSearchRegionsApiRegionGet({
     page_number: currentPage,
@@ -68,7 +70,8 @@ function RegionsPage() {
     <VStack spacing={"30px"}>
       <TabsMenu selectedTabIndex={1} />
       <TableHeader
-        isEditingAvailable={!!currentUser}
+        objectType={"region"}
+        isEditingAvailable={!!currentUserData && !isErrorGettingCurrentUser}
         isSearchAvailable={true}
         isMapAvailable={false}
         onDeletedFlagChange={handleDeletedIncluded}
@@ -81,16 +84,14 @@ function RegionsPage() {
       />
       <Flex width={"100%"} direction={"column"} gap={"15px"}>
         <Skeleton isLoaded={!isLoading}>
-          <TableContainer
-            className={'inset-wrapper'}
-          >
+          <TableContainer className={"inset-wrapper"}>
             {regionsPage?.data.length == 0 ? (
               <NotFound />
             ) : (
               <Table
                 variant="simple"
                 style={{ tableLayout: "auto", width: "100%" }}
-                className={'inset-container not-at-right'}
+                className={"inset-container not-at-right"}
                 css={{
                   "&::-webkit-scrollbar": {
                     width: "4px",
@@ -125,6 +126,7 @@ function RegionsPage() {
                     <Tr
                       width={"100%"}
                       backgroundColor={region.deleted_at ? "#f7eded" : "white"}
+                      key={region.id}
                     >
                       <Td
                         color={"orange.700"}

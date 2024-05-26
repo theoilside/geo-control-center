@@ -11,10 +11,12 @@ import {
 import { BiPlus, BiMapAlt, BiSearch, BiRightArrowAlt } from "react-icons/bi";
 import { ChangeEvent, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { DrawerAddObject } from "../drawer-add-object/DrawerAddObject.tsx";
+import { DrawerAddCountry } from "../drawer-add-object/DrawerAddCountry.tsx";
 import { IS_AUTO_SEARCH } from "../../settings.ts";
+import { DrawerAddRegion } from "../drawer-add-object/DrawerAddRegion.tsx";
 
 type TableHeaderProps = {
+  objectType: string;
   isEditingAvailable: boolean;
   isMapAvailable: boolean;
   isSearchAvailable: boolean;
@@ -31,7 +33,9 @@ function TableHeader({ ...props }: TableHeaderProps) {
   const [goToIdValue, setGoToIdValue] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string | null>(null);
-  const [parentObjectId, setParentObjectId] = useState<string | null>(props.parentObjectId ?? null);
+  const [parentObjectId, setParentObjectId] = useState<string | null>(
+    props.parentObjectId ?? null,
+  );
   const [isDrawerOpened, setIsDrawerOpened] = useState(false);
   const navigate = useNavigate();
   const isGoToIdValueInvalid: boolean = false;
@@ -42,9 +46,9 @@ function TableHeader({ ...props }: TableHeaderProps) {
 
   const handleGoToId = (goToIdValue: string | null) => {
     if (goToIdValue) {
-        const objectId = parseInt(goToIdValue);
-        navigate(props.getObjectPagePathById(objectId));
-      }
+      const objectId = parseInt(goToIdValue);
+      navigate(props.getObjectPagePathById(objectId));
+    }
   };
 
   useEffect(() => {
@@ -70,17 +74,35 @@ function TableHeader({ ...props }: TableHeaderProps) {
     setIsDrawerOpened(!isDrawerOpened);
   };
 
+  function getDrawer(objectType: string) {
+    switch (objectType) {
+      case "region": {
+        return (
+          <DrawerAddRegion
+            isOpened={isDrawerOpened}
+            handleOpenedState={(isOpened) => setIsDrawerOpened(isOpened)}
+          />
+        );
+      }
+      default: {
+        return (
+          <DrawerAddCountry
+            isOpened={isDrawerOpened}
+            handleOpenedState={(isOpened) => setIsDrawerOpened(isOpened)}
+          />
+        );
+      }
+    }
+  }
+
   return (
     <Flex w={"100%"} wrap={"nowrap"}>
-      <DrawerAddObject
-        isOpened={isDrawerOpened}
-        handleOpenedState={(isOpened) => setIsDrawerOpened(isOpened)}
-      />
+      {getDrawer(props.objectType)}
       <HStack spacing={"20px"} flexGrow={1}>
-        <InputGroup minW={'100px'} maxW={"130px"} width={'20%'}>
+        <InputGroup minW={"100px"} maxW={"130px"} width={"20%"}>
           <Input
             onChange={handleGoToIdValueChange}
-            type={'number'}
+            type={"number"}
             placeholder="ID"
             isInvalid={isGoToIdValueInvalid}
             onKeyDown={(e) => {
@@ -102,32 +124,32 @@ function TableHeader({ ...props }: TableHeaderProps) {
           </InputRightElement>
         </InputGroup>
         {props.isSearchByParentObjectIdAvailable && (
-            <InputGroup minW={'140px'} maxW={"160px"} width={'20%'}>
-              <Input
-                  onChange={(event) => setParentObjectId(event.target.value)}
-                  value={parentObjectId ? parentObjectId : undefined}
-                  placeholder={`ID ${props.parentObjectName}`}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      handleSearchByParentObjectId(parentObjectId);
-                    }
-                  }}
+          <InputGroup minW={"140px"} maxW={"160px"} width={"20%"}>
+            <Input
+              onChange={(event) => setParentObjectId(event.target.value)}
+              value={parentObjectId ? parentObjectId : undefined}
+              placeholder={`ID ${props.parentObjectName}`}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleSearchByParentObjectId(parentObjectId);
+                }
+              }}
+            />
+            <InputRightElement>
+              <IconButton
+                onClick={() => handleSearchByParentObjectId(parentObjectId)}
+                aria-label={"Поиск"}
+                icon={<BiSearch />}
+                colorScheme="gray"
+                variant="ghost"
+                h="1.85rem"
+                size="sm"
               />
-              <InputRightElement>
-                <IconButton
-                    onClick={() => handleSearchByParentObjectId(parentObjectId)}
-                    aria-label={"Поиск"}
-                    icon={<BiSearch />}
-                    colorScheme="gray"
-                    variant="ghost"
-                    h="1.85rem"
-                    size="sm"
-                />
-              </InputRightElement>
-            </InputGroup>
+            </InputRightElement>
+          </InputGroup>
         )}
         {props.isSearchAvailable && (
-          <InputGroup maxW={"270px"} width={'30%'}>
+          <InputGroup maxW={"270px"} width={"30%"}>
             <Input
               onChange={(event) => setSearchQuery(event.target.value)}
               value={searchQuery ? searchQuery : undefined}

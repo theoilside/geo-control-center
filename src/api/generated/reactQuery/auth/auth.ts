@@ -269,11 +269,17 @@ export const getUsersCurrentUserAuthMeGetQueryOptions = <
   const queryKey =
     queryOptions?.queryKey ?? getUsersCurrentUserAuthMeGetQueryKey();
 
+  const staleTime: number = 30000;
+  const gcTime: number = 30000;
+  const retry: boolean = false;
+
   const queryFn: QueryFunction<
     Awaited<ReturnType<typeof usersCurrentUserAuthMeGet>>
   > = ({ signal }) => usersCurrentUserAuthMeGet(signal);
 
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+
+
+  return { queryKey, queryFn, staleTime, gcTime, retry, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof usersCurrentUserAuthMeGet>>,
     TError,
     TData

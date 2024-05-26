@@ -6,7 +6,7 @@ import Footer from "./components/Footer.tsx";
 
 const BaseLayout: React.FC = () => {
   return (
-    <Flex direction={"column"} justify={"space-between"}>
+    <Flex direction={"column"} justify={"space-between"} minH={"100vh"}>
       <Container padding={"0 5vw 0 5vw"} maxW={"100vw"}>
         <Header />
         <Outlet />

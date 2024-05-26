@@ -23,12 +23,13 @@ import { useSearchCountriesApiCountryGet } from "../../../api/generated/reactQue
 import { formatDate } from "../../../components/formatDate.ts";
 import { Pagination } from "../../../components/table/Pagination.tsx";
 import { NotFound } from "../../../components/table/NotFound.tsx";
+import {useUsersCurrentUserAuthMeGet} from "../../../api/generated/reactQuery/auth/auth.ts";
 
 export default function CountriesPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState<string | null>(null);
   const [isDeletedIncluded, setIsDeletedIncluded] = useState(false);
-  const currentUser = null;
+  const { data: currentUserData, isError: isErrorGettingCurrentUser } = useUsersCurrentUserAuthMeGet();
 
   const { data: countriesPage, isLoading } = useSearchCountriesApiCountryGet({
     page_number: currentPage,
@@ -56,7 +57,8 @@ export default function CountriesPage() {
       <VStack spacing={"30px"}>
         <TabsMenu selectedTabIndex={0} />
         <TableHeader
-          isEditingAvailable={!!currentUser}
+          objectType={'country'}
+          isEditingAvailable={!!currentUserData && !isErrorGettingCurrentUser}
           isSearchAvailable={true}
           isMapAvailable={false}
           onDeletedFlagChange={handleDeletedIncluded}

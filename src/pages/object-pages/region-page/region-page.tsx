@@ -17,17 +17,24 @@ import { Link as RouterLink } from "react-router-dom";
 import { REGIONS_PAGE } from "../../../routes/route-paths.ts";
 import ErrorPage from "../../error-page/error-page.tsx";
 import { useObjectId } from "../../../hooks/useObjectId.ts";
-import { RowObjectInfo } from "../../../components/object-page/RowObjectInfo.tsx";
 import { RowObjectInfoLink } from "../../../components/object-page/RowObjectInfoLink.tsx";
 import Map from "../../../components/map/map.tsx";
 import { HeaderWithAction } from "../../../components/object-page/HeaderWithActions.tsx";
 import { formatDate } from "../../../components/formatDate.ts";
 import { timeSince } from "../../../components/timeSince.ts";
 import {
-  useGetRegionByIdApiRegionIdGet, useSearchRegionsApiRegionGet,
+  useGetRegionByIdApiRegionIdGet,
+  useSearchRegionsApiRegionGet,
   useUpdateRegionApiRegionIdPatch,
 } from "../../../api/generated/reactQuery/region/region.ts";
 import { ConnectedObjectsInfo } from "../../../components/object-page/ConnectedObjectsInfo.tsx";
+import { useGetCountryByIdApiCountryIdGet } from "../../../api/generated/reactQuery/country/country.ts";
+import { RowParentObjectInfo } from "../../../components/object-page/RowParentObjectInfo.tsx";
+import {
+  useGetLanguagesApiTranslateLanguageGet,
+  useGetTranslateByIdApiTranslateGet
+} from "../../../api/generated/reactQuery/translate/translate.ts";
+import {RowObjectTranslationsInfo} from "../../../components/object-page/RowObjectTranslationsInfo.tsx";
 
 function RegionPage() {
   const regionIndex = useObjectId();
@@ -44,6 +51,17 @@ function RegionPage() {
     page_size: 10,
     country_id: region?.country_id.toString(),
   });
+  const { data: country, isLoading: countryLoading } =
+    useGetCountryByIdApiCountryIdGet(region?.country_id ?? 1);
+  const { data: translations, refetch: refetchTranslations } = useGetTranslateByIdApiTranslateGet({
+    entity: "region",
+    entity_id: region?.id ?? 1,
+  });
+  const {data: languages} = useGetLanguagesApiTranslateLanguageGet();
+
+  function updateTranslations() {
+    refetchTranslations();
+  }
 
   if (error) {
     return <ErrorPage />;
@@ -83,8 +101,8 @@ function RegionPage() {
       </Fade>
       <ScaleFade initialScale={0.95} in={!isLoading}>
         <Flex gap={"10px"}>
-          <VStack flexGrow={1} width={'100%'}>
-            <Card variant={"outline"} width={'100%'}>
+          <VStack flexGrow={1} width={"100%"}>
+            <Card variant={"outline"} width={"100%"}>
               <HeaderWithAction
                 objectTitle={region?.name}
                 objectType={"Регион"}
@@ -96,17 +114,26 @@ function RegionPage() {
                 lastEditedAgo={timeSince(region?.last_updated_at)}
                 refetchFunction={refetch}
                 changeAutoUpdatableFunction={handleChangeAutoUpdatable}
+                translations={translations}
               />
               <CardBody>
                 <Stack divider={<StackDivider />} spacing="4">
-                  <RowObjectInfo
-                    title={"Страна"}
-                    content={region?.country_id}
+                  <RowParentObjectInfo
+                    parentObjectType={"Страна"}
+                    parentObjectId={country?.id}
+                    parentObjectLink={"/countries/"}
+                    parentObjectName={country?.name}
+                    isLoading={countryLoading}
                   />
                   <RowObjectInfoLink
                     title={"OSM (Nominatim)"}
                     link={`https://nominatim.openstreetmap.org/ui/details.html?osmtype=${region?.osm_type}&osmid=${region?.osm_id}`}
                     content={`${region?.osm_type}${region?.osm_id}`}
+                  />
+                  <RowObjectTranslationsInfo
+                  translations={translations}
+                  refetchTranslations={updateTranslations}
+                  languages={languages}
                   />
                 </Stack>
               </CardBody>
@@ -128,12 +155,14 @@ function RegionPage() {
         </Flex>
       </ScaleFade>
       <ConnectedObjectsInfo
-          connectedObjects={connectedRegions?.data.filter((object) => object.id !== regionIndex)}
-          connectedObjectsTypeName={'Регион'}
-          headerTitle={'Относятся к той же стране'}
-          goToSearchLink={`/regions?countryId=${region?.country_id}`}
-          goToObjectLink={'/regions/'}
-          isAllObjectsShown={connectedRegions?.pagination.total_pages === 1}
+        connectedObjects={connectedRegions?.data.filter(
+          (object) => object.id !== regionIndex,
+        )}
+        connectedObjectsTypeName={"Регион"}
+        headerTitle={"Относятся к той же стране"}
+        goToSearchLink={`/regions?countryId=${region?.country_id}`}
+        goToObjectLink={"/regions/"}
+        isAllObjectsShown={connectedRegions?.pagination.total_pages === 1}
       />
     </VStack>
   );
