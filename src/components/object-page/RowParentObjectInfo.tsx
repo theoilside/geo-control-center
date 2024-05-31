@@ -22,7 +22,7 @@ export function RowParentObjectInfo({ ...props }: RowParentObjectInfoProps) {
   const navigate = useNavigate();
 
   return (
-    <Box>
+    <Box width={'100%'}>
       {props.isLoading ? (
         <Spinner />
       ) : (
@@ -31,14 +31,15 @@ export function RowParentObjectInfo({ ...props }: RowParentObjectInfoProps) {
           padding={"8px 16px"}
           backgroundColor={"gray.100"}
           height={"58px"}
+          width={'100%'}
           _hover={{ backgroundColor: "#e8eef1" }}
           onClick={() =>
             navigate(`${props.parentObjectLink}${props.parentObjectId}`)
           }
           style={{ cursor: "pointer" }}
         >
-          <HStack height={"100%"} justifyContent={"space-between"}>
-            <VStack spacing={"0px"} alignItems={"flex-start"}>
+          <HStack height={"100%"} justifyContent={"space-between"} width={'100%'}>
+            <VStack spacing={"0px"} alignItems={"flex-start"} width={'100%'}>
               <Text fontSize={"xs"}>
                 {props.parentObjectType} #{props.parentObjectId}
               </Text>

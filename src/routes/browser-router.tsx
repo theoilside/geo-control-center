@@ -7,8 +7,8 @@ import {
   REGIONS_PAGE,
   COUNTRY_PAGE,
   REGION_PAGE,
-  // CITIES_PAGE,
-  // CITY_PAGE,
+  CITIES_PAGE,
+  CITY_PAGE,
   // AIRPORTS_PAGE,
   // AIRPORT_PAGE,
   // RAIL_STATIONS_PAGE,
@@ -23,6 +23,8 @@ import RegionsPage from "../pages/table-pages/regions-page/regions-page.tsx";
 import LoginPage from "../pages/login-page/login-page.tsx";
 import CountryPage from "../pages/object-pages/country-page/country-page.tsx";
 import RegionPage from "../pages/object-pages/region-page/region-page.tsx";
+import CitiesPage from "../pages/table-pages/cities-page/cities-page.tsx";
+import CityPage from "../pages/object-pages/city-page/city-page.tsx";
 
 const router = createBrowserRouter(
   [
@@ -50,6 +52,14 @@ const router = createBrowserRouter(
         {
           path: REGION_PAGE,
           element: <RegionPage />,
+        },
+        {
+          path: CITIES_PAGE,
+          element: <CitiesPage />,
+        },
+        {
+          path: CITY_PAGE,
+          element: <CityPage />,
         },
       ],
     },

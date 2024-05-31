@@ -30,6 +30,7 @@ import ReactCountryFlag from "react-country-flag";
 import {useUsersCurrentUserAuthMeGet} from "../../api/generated/reactQuery/auth/auth.ts";
 import {DrawerEditRegion} from "../drawer-edit-object/DrawerEditRegion.tsx";
 import {TranslateRead} from "../../api/generated/model";
+import {DrawerEditCity} from "../drawer-edit-object/DrawerEditCity.tsx";
 
 type HeaderWithActionsProps = {
   objectTitle?: string;
@@ -69,6 +70,15 @@ export function HeaderWithAction({ ...props }: HeaderWithActionsProps) {
                 handleOpenedState={handleIsDrawerOpened}
                 refetchFunction={props.refetchFunction}
             />
+        );
+      }
+      case "Город": {
+        return (
+          <DrawerEditCity
+            isOpened={isDrawerOpened}
+            handleOpenedState={handleIsDrawerOpened}
+            refetchFunction={props.refetchFunction}
+          />
         );
       }
       default: {

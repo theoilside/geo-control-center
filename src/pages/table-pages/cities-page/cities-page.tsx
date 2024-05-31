@@ -20,21 +20,25 @@ import {
   useSearchParams,
 } from "react-router-dom";
 import TableHeader from "../../../components/table/TableHeader.tsx";
-import { getRegionPagePathById } from "../../../routes/routes.ts";
+import {getCityPagePathById} from "../../../routes/routes.ts";
 import {useEffect, useState} from "react";
 import { ROWS_PER_PAGE } from "../../../settings.ts";
 import { formatDate } from "../../../components/formatDate.ts";
 import { Pagination } from "../../../components/table/Pagination.tsx";
 import { NotFound } from "../../../components/table/NotFound.tsx";
-import { useSearchRegionsApiRegionGet } from "../../../api/generated/reactQuery/region/region.ts";
 import { useUsersCurrentUserAuthMeGet } from "../../../api/generated/reactQuery/auth/auth.ts";
+import {useSearchCitiesApiCityGet} from "../../../api/generated/reactQuery/city/city.ts";
 
-function RegionsPage() {
+export default function CitiesPage() {
   const [searchParams] = useSearchParams();
+  const newRegionId = searchParams.get("regionId");
   const newCountryId = searchParams.get("countryId");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [searchTerm, setSearchTerm] = useState<string | null>(null);
   const [isDeletedIncluded, setIsDeletedIncluded] = useState<boolean>(false);
+  const [regionId, setRegionId] = useState<string | null>(
+    newRegionId ?? null,
+  );
   const [countryId, setCountryId] = useState<string | null>(
     newCountryId ?? null,
   );
@@ -42,20 +46,22 @@ function RegionsPage() {
   const { data: currentUserData, isError: isErrorGettingCurrentUser } =
     useUsersCurrentUserAuthMeGet();
 
-  const { data: regionsPage, isLoading, refetch } = useSearchRegionsApiRegionGet({
+  const { data: citiesPage, isLoading, refetch } = useSearchCitiesApiCityGet({
     page_number: currentPage,
     page_size: ROWS_PER_PAGE,
     term: searchTerm,
     include_deleted: isDeletedIncluded,
+    region_id: regionId,
     country_id: countryId,
   });
 
   useEffect(() => {
     refetch();
-  }, [searchTerm, countryId, refetch]);
+  }, [regionId, countryId, searchTerm, refetch]);
 
-  function handleSearchUpdate(term: string | null, countryId: string | null) {
+  function handleSearchUpdate(term: string | null, regionId: string | null, countryId: string | null) {
     setSearchTerm(term);
+    setRegionId(regionId);
     setCountryId(countryId);
   }
 
@@ -73,23 +79,26 @@ function RegionsPage() {
 
   return (
     <VStack spacing={"30px"}>
-      <TabsMenu selectedTabIndex={1} />
+      <TabsMenu selectedTabIndex={2} />
       <TableHeader
-        objectType={"region"}
+        objectType={"city"}
         isEditingAvailable={!!currentUserData && !isErrorGettingCurrentUser}
         isSearchAvailable={true}
         isMapAvailable={false}
         onDeletedFlagChange={handleDeletedIncluded}
-        getObjectPagePathById={getRegionPagePathById}
+        getObjectPagePathById={getCityPagePathById}
         isSearchByParentObjectIdAvailable={true}
-        parentObjectName={"страны"}
-        parentObjectId={countryId}
+        parentObjectName={"региона"}
+        parentObjectId={regionId}
+        isSearchBySecondParentObjectIdAvailable={true}
+        secondParentObjectName={"страны"}
+        secondParentObjectId={countryId}
         handleUpdateSearch={handleSearchUpdate}
       />
       <Flex width={"100%"} direction={"column"} gap={"15px"}>
         <Skeleton isLoaded={!isLoading}>
           <TableContainer className={"inset-wrapper"}>
-            {regionsPage?.data.length == 0 ? (
+            {citiesPage?.data.length == 0 ? (
               <NotFound />
             ) : (
               <Table
@@ -121,16 +130,19 @@ function RegionsPage() {
                     </Th>
                     <Th style={{ textAlign: "start" }}>Название</Th>
                     <Th style={{ textAlign: "start" }}>Страна</Th>
+                    <Th style={{ textAlign: "start" }}>Регион</Th>
+                    <Th style={{ textAlign: "start" }}>Код</Th>
+                    <Th style={{ textAlign: "start" }}>Часовой пояс</Th>
                     <Th style={{ textAlign: "start" }}>OSM</Th>
                     <Th style={{ textAlign: "start" }}>Изменено</Th>
                   </Tr>
                 </Thead>
                 <Tbody>
-                  {regionsPage?.data.map((region) => (
+                  {citiesPage?.data.map((city) => (
                     <Tr
                       width={"100%"}
-                      backgroundColor={region.deleted_at ? "#f7eded" : "white"}
-                      key={region.id}
+                      backgroundColor={city.deleted_at ? "#f7eded" : "white"}
+                      key={city.id}
                     >
                       <Td
                         color={"orange.700"}
@@ -142,11 +154,11 @@ function RegionsPage() {
                         <Flex width={"70px"} justifyContent={"space-between"}>
                           <Link
                             as={ReactRouterLink}
-                            to={getRegionPagePathById(region.id)}
+                            to={getCityPagePathById(city.id)}
                             style={{ lineHeight: "24px" }}
                             isExternal
                           >
-                            {region.id}
+                            {city.id}
                           </Link>
                           <IconButton
                             aria-label={"Перейти"}
@@ -155,7 +167,7 @@ function RegionsPage() {
                             colorScheme="orange"
                             isRound={true}
                             onClick={() =>
-                              navigate(getRegionPagePathById(region.id))
+                              navigate(getCityPagePathById(city.id))
                             }
                           />
                         </Flex>
@@ -166,22 +178,25 @@ function RegionsPage() {
                         whiteSpace={"nowrap"}
                         overflow={"hidden"}
                       >
-                        {region.name}
+                        {city.name}
                       </Td>
-                      <Td>{region.country_id}</Td>
+                      <Td>{city.country_id}</Td>
+                      <Td>{city.region_id}</Td>
+                      <Td>{city.iata}</Td>
+                      <Td>{city.timezone}</Td>
                       <Td>
                         <Link
-                          href={`https://nominatim.openstreetmap.org/ui/details.html?osmtype=${region?.osm_type}&osmid=${region?.osm_id}`}
+                          href={`https://nominatim.openstreetmap.org/ui/details.html?osmtype=${city?.osm_type}&osmid=${city?.osm_id}`}
                           color={"teal"}
                           isExternal
                         >
-                          {region.osm_type}
-                          {region.osm_id}
+                          {city.osm_type}
+                          {city.osm_id}
                           <ExternalLinkIcon mx="4px" />
                         </Link>
                       </Td>
                       <Td width={"100vw"}>
-                        {formatDate(region.last_updated_at)}
+                        {formatDate(city.last_updated_at)}
                       </Td>
                     </Tr>
                   ))}
@@ -190,10 +205,10 @@ function RegionsPage() {
             )}
           </TableContainer>
         </Skeleton>
-        {regionsPage && regionsPage.pagination.total_pages > 1 && (
+        {citiesPage && citiesPage.pagination.total_pages > 1 && (
           <Pagination
             currentPage={currentPage}
-            totalPages={regionsPage?.pagination.total_pages}
+            totalPages={citiesPage?.pagination.total_pages}
             handleNextPageClick={handleNextPageClick}
             handlePrevPageClick={handlePrevPageClick}
           />
@@ -202,5 +217,3 @@ function RegionsPage() {
     </VStack>
   );
 }
-
-export default RegionsPage;

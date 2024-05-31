@@ -17,7 +17,7 @@ import { ArrowForwardIcon, ExternalLinkIcon } from "@chakra-ui/icons";
 import { Link as ReactRouterLink, useNavigate } from "react-router-dom";
 import TableHeader from "../../../components/table/TableHeader.tsx";
 import { getCountryPagePathById } from "../../../routes/routes.ts";
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import { ROWS_PER_PAGE } from "../../../settings.ts";
 import { useSearchCountriesApiCountryGet } from "../../../api/generated/reactQuery/country/country.ts";
 import { formatDate } from "../../../components/formatDate.ts";
@@ -31,12 +31,20 @@ export default function CountriesPage() {
   const [isDeletedIncluded, setIsDeletedIncluded] = useState(false);
   const { data: currentUserData, isError: isErrorGettingCurrentUser } = useUsersCurrentUserAuthMeGet();
 
-  const { data: countriesPage, isLoading } = useSearchCountriesApiCountryGet({
+  const { data: countriesPage, isLoading, refetch } = useSearchCountriesApiCountryGet({
     page_number: currentPage,
     page_size: ROWS_PER_PAGE,
     term: searchTerm,
     include_deleted: isDeletedIncluded,
   });
+
+  useEffect(() => {
+    refetch();
+  }, [searchTerm, refetch]);
+
+  function handleSearchUpdate(term: string | null) {
+    setSearchTerm(term);
+  }
 
   function handleNextPageClick() {
     setCurrentPage(currentPage + 1);
@@ -63,8 +71,8 @@ export default function CountriesPage() {
           isMapAvailable={false}
           onDeletedFlagChange={handleDeletedIncluded}
           getObjectPagePathById={getCountryPagePathById}
-          handleSearch={(term: string | null) => setSearchTerm(term)}
           isSearchByParentObjectIdAvailable={false}
+          handleUpdateSearch={handleSearchUpdate}
         />
         <Flex width={"100%"} direction={"column"} gap={"15px"}>
           <Skeleton isLoaded={!isLoading}>

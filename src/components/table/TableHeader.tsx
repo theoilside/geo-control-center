@@ -7,6 +7,7 @@ import {
   Input,
   InputRightElement,
   IconButton,
+  Divider,
 } from "@chakra-ui/react";
 import { BiPlus, BiMapAlt, BiSearch, BiRightArrowAlt } from "react-icons/bi";
 import { ChangeEvent, useEffect, useState } from "react";
@@ -14,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import { DrawerAddCountry } from "../drawer-add-object/DrawerAddCountry.tsx";
 import { IS_AUTO_SEARCH } from "../../settings.ts";
 import { DrawerAddRegion } from "../drawer-add-object/DrawerAddRegion.tsx";
+import {DrawerAddCity} from "../drawer-add-object/DrawerAddCity.tsx";
 
 type TableHeaderProps = {
   objectType: string;
@@ -21,12 +23,18 @@ type TableHeaderProps = {
   isMapAvailable: boolean;
   isSearchAvailable: boolean;
   isSearchByParentObjectIdAvailable: boolean;
+  isSearchBySecondParentObjectIdAvailable?: boolean;
   onDeletedFlagChange: () => void;
   getObjectPagePathById: (objectId: number) => string;
-  handleSearch: (term: string | null) => void;
-  handleChangeParentObjectId?: (parentObjectId: string | null) => void;
   parentObjectName?: string;
   parentObjectId?: string | null;
+  secondParentObjectName?: string;
+  secondParentObjectId?: string | null;
+  handleUpdateSearch: (
+    term: string | null,
+    regionId: string | null,
+    countryId: string | null,
+  ) => void;
 };
 
 function TableHeader({ ...props }: TableHeaderProps) {
@@ -36,6 +44,9 @@ function TableHeader({ ...props }: TableHeaderProps) {
   const [parentObjectId, setParentObjectId] = useState<string | null>(
     props.parentObjectId ?? null,
   );
+  const [secondParentObjectId, setSecondParentObjectId] = useState<
+    string | null
+  >(props.secondParentObjectId ?? null);
   const [isDrawerOpened, setIsDrawerOpened] = useState(false);
   const navigate = useNavigate();
   const isGoToIdValueInvalid: boolean = false;
@@ -57,17 +68,12 @@ function TableHeader({ ...props }: TableHeaderProps) {
   }, [searchQuery]);
 
   useEffect(() => {
-    if (IS_AUTO_SEARCH) props.handleSearch(searchTerm);
+    if (IS_AUTO_SEARCH) props.handleUpdateSearch(searchTerm, parentObjectId, secondParentObjectId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchTerm]);
 
-  const handleSearch = (term: string | null) => {
-    props.handleSearch(term);
-  };
-
-  const handleSearchByParentObjectId = (parentObjectId: string | null) => {
-    if (props.handleChangeParentObjectId)
-      props.handleChangeParentObjectId(parentObjectId);
+  const handleSearch = () => {
+    props.handleUpdateSearch(searchTerm, parentObjectId, secondParentObjectId);
   };
 
   const handleIsDrawerOpened = () => {
@@ -79,6 +85,14 @@ function TableHeader({ ...props }: TableHeaderProps) {
       case "region": {
         return (
           <DrawerAddRegion
+            isOpened={isDrawerOpened}
+            handleOpenedState={(isOpened) => setIsDrawerOpened(isOpened)}
+          />
+        );
+      }
+      case "city": {
+        return (
+          <DrawerAddCity
             isOpened={isDrawerOpened}
             handleOpenedState={(isOpened) => setIsDrawerOpened(isOpened)}
           />
@@ -98,8 +112,8 @@ function TableHeader({ ...props }: TableHeaderProps) {
   return (
     <Flex w={"100%"} wrap={"nowrap"}>
       {getDrawer(props.objectType)}
-      <HStack spacing={"20px"} flexGrow={1}>
-        <InputGroup minW={"100px"} maxW={"130px"} width={"20%"}>
+      <HStack spacing={"10px"} flexGrow={1}>
+        <InputGroup minW={"90px"} maxW={"100px"} width={"20%"}>
           <Input
             onChange={handleGoToIdValueChange}
             type={"number"}
@@ -124,28 +138,34 @@ function TableHeader({ ...props }: TableHeaderProps) {
           </InputRightElement>
         </InputGroup>
         {props.isSearchByParentObjectIdAvailable && (
+          <>
+            <Divider orientation={"vertical"} />
+            <InputGroup minW={"140px"} maxW={"160px"} width={"20%"}>
+              <Input
+                onChange={(event) => setParentObjectId(event.target.value)}
+                value={parentObjectId ? parentObjectId : undefined}
+                placeholder={`ID ${props.parentObjectName}`}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleSearch();
+                  }
+                }}
+              />
+            </InputGroup>
+          </>
+        )}
+        {props.isSearchBySecondParentObjectIdAvailable && (
           <InputGroup minW={"140px"} maxW={"160px"} width={"20%"}>
             <Input
-              onChange={(event) => setParentObjectId(event.target.value)}
-              value={parentObjectId ? parentObjectId : undefined}
-              placeholder={`ID ${props.parentObjectName}`}
+              onChange={(event) => setSecondParentObjectId(event.target.value)}
+              value={secondParentObjectId ? secondParentObjectId : undefined}
+              placeholder={`ID ${props.secondParentObjectName}`}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
-                  handleSearchByParentObjectId(parentObjectId);
+                  handleSearch();
                 }
               }}
             />
-            <InputRightElement>
-              <IconButton
-                onClick={() => handleSearchByParentObjectId(parentObjectId)}
-                aria-label={"Поиск"}
-                icon={<BiSearch />}
-                colorScheme="gray"
-                variant="ghost"
-                h="1.85rem"
-                size="sm"
-              />
-            </InputRightElement>
           </InputGroup>
         )}
         {props.isSearchAvailable && (
@@ -153,26 +173,21 @@ function TableHeader({ ...props }: TableHeaderProps) {
             <Input
               onChange={(event) => setSearchQuery(event.target.value)}
               value={searchQuery ? searchQuery : undefined}
-              placeholder="Поиск"
+              placeholder="Название"
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
-                  handleSearch(searchQuery);
+                  handleSearch();
                 }
               }}
             />
-            <InputRightElement>
-              <IconButton
-                onClick={() => handleSearch(searchTerm)}
-                aria-label={"Поиск"}
-                icon={<BiSearch />}
-                colorScheme="gray"
-                variant="ghost"
-                h="1.85rem"
-                size="sm"
-              />
-            </InputRightElement>
           </InputGroup>
         )}
+        <IconButton
+          icon={<BiSearch />}
+          onClick={() => handleSearch()}
+          colorScheme={'orange'}
+          aria-label={'Поиск'}
+        />
       </HStack>
       <HStack spacing={"20px"}>
         <Checkbox

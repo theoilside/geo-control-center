@@ -54,8 +54,13 @@ export function DrawerEditCountry({ ...props }: DrawerEditCountryProps) {
           duration: 3000,
         });
       })
-      .catch((error) => {
-        console.error("Failed to update:", error);
+      .catch(() => {
+        toast({
+          title: 'Ошибка 500',
+          description: "Проверьте правильность данных",
+          status: "error",
+          duration: 3000,
+        });
       });
   };
 

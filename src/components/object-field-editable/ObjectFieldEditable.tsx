@@ -37,7 +37,7 @@ export function ObjectFieldEditable<T extends NonNullable<unknown>>({
           handleChange(e);
           setIsInvalid(false);
         }}
-        value={props.value as string | number | undefined}
+        defaultValue={props.value as string | number | undefined}
         id={props.fieldName.toString()}
         placeholder={props.placeholder}
         type={props.type}

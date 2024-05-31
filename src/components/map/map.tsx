@@ -23,6 +23,8 @@ function Map({ ...props }: MapProps) {
         attributionControl={false}
       >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+        {/*https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png*/}
+        {/*https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png*/}
         <Marker position={[props.pointGeometry.lat ?? 0, props.pointGeometry.lon ?? 0]}>
           <Popup>
             {props.pointName} ({props.pointType}) <br /> {props.pointGeometry.lat ?? 0}, {props.pointGeometry.lon ?? 0}
